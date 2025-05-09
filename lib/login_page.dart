@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'loading_game.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -88,7 +89,12 @@ class LoginFormContainer extends StatelessWidget {
                   ),
                   const SizedBox(height: 30),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LoadingGamePage()),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF00DB8F),
                       shape: RoundedRectangleBorder(
@@ -99,9 +105,9 @@ class LoginFormContainer extends StatelessWidget {
                     child: const Text(
                       'Entrar',
                       style: TextStyle(
-                        fontSize: 18, color:
-                        Colors.white
-                        ),
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
