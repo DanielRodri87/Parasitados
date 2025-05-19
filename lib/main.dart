@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'login_page.dart'; // Certifique-se de ter esse arquivo no seu projeto
+import 'login_page.dart'; 
 
 void main() {
   runApp(const MyApp());
