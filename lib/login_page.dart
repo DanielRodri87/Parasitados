@@ -70,16 +70,17 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
 
     final db = await LoginDatabase().database;
 
-    await db.insert(
-      'login',
-      {
-        'nome1': nome1,
-        'nome2': nome2,
-        'foto1': foto1.isNotEmpty ? foto1 : null,
-        'foto2': foto2.isNotEmpty ? foto2 : null,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+  await db.insert(
+    'login',
+    {
+      'id': 1, // Sempre sobrescrevendo este registro
+      'nome1': nome1,
+      'nome2': nome2,
+      'foto1': foto1.isNotEmpty ? foto1 : null,
+      'foto2': foto2.isNotEmpty ? foto2 : null,
+    },
+    conflictAlgorithm: ConflictAlgorithm.replace,
+  );
   }
 
   @override

@@ -1,8 +1,82 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'login_database.dart';
+import 'home.dart';
 
-class LoadingGamePage extends StatelessWidget {
+class LoadingGamePage extends StatefulWidget {
   const LoadingGamePage({super.key});
+
+  @override
+  State<LoadingGamePage> createState() => _LoadingGamePageState();
+}
+
+class _LoadingGamePageState extends State<LoadingGamePage> {
+  String nome1 = '';
+  String nome2 = '';
+  String? foto1;
+  String? foto2;
+
+  String carregandoTexto = 'Carregando';
+  int pontoCount = 0;
+  Timer? timer;
+
+  @override
+  void initState() {
+    super.initState();
+    carregarDados();
+    iniciarAnimacaoTexto();
+    iniciarTemporizador();
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  void iniciarAnimacaoTexto() {
+    timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      setState(() {
+        pontoCount = (pontoCount + 1) % 4;
+        carregandoTexto = 'Carregando${'.' * pontoCount}';
+      });
+    });
+  }
+
+  void iniciarTemporizador() {
+    Future.delayed(const Duration(seconds: 30), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    });
+  }
+
+  Future<void> carregarDados() async {
+    try {
+      final db = await LoginDatabase().database;
+      final resultado = await db.query('login', limit: 1);
+
+      if (resultado.isNotEmpty) {
+        final dados = resultado.first;
+        setState(() {
+          nome1 = dados['nome1'] as String? ?? 'Jogador 1';
+          nome2 = dados['nome2'] as String? ?? 'Jogador 2';
+          foto1 = dados['foto1'] as String?;
+          foto2 = dados['foto2'] as String?;
+        });
+      } else {
+        setState(() {
+          nome1 = 'Jogador 1';
+          nome2 = 'Jogador 2';
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao carregar os dados: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +101,10 @@ class LoadingGamePage extends StatelessWidget {
             const SizedBox(height: 60),
             Image.asset(
               'assets/images/LogoApp.png',
-              height: 260,
+              height: 200,
             ),
             const Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(60)),
-                child: PlayerInfoContainer(),
-              ),
+              child: PlayerInfoContainer(),
             ),
           ],
         ),
@@ -52,11 +123,43 @@ class PlayerInfoContainer extends StatefulWidget {
 class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
   String nome1 = '';
   String nome2 = '';
+  String? foto1;
+  String? foto2;
+
+  String carregandoTexto = 'Carregando';
+  int pontoCount = 0;
+  Timer? timer;
 
   @override
   void initState() {
     super.initState();
     carregarDados();
+    iniciarAnimacaoTexto();
+    iniciarTemporizador();
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  void iniciarAnimacaoTexto() {
+    timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      setState(() {
+        pontoCount = (pontoCount + 1) % 4;
+        carregandoTexto = 'Carregando${'.' * pontoCount}';
+      });
+    });
+  }
+
+  void iniciarTemporizador() {
+    Future.delayed(const Duration(seconds: 10), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    });
   }
 
   Future<void> carregarDados() async {
@@ -69,6 +172,8 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
         setState(() {
           nome1 = dados['nome1'] as String? ?? 'Jogador 1';
           nome2 = dados['nome2'] as String? ?? 'Jogador 2';
+          foto1 = dados['foto1'] as String?;
+          foto2 = dados['foto2'] as String?;
         });
       } else {
         setState(() {
@@ -85,33 +190,74 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/back_login.png'),
-          fit: BoxFit.cover,
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Image.asset(
+            'assets/images/back_login.png',
+            fit: BoxFit.fill,
+          ),
         ),
-      ),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(30),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            Text(
-              'Jogador 1: $nome1',
-              style: const TextStyle(fontSize: 22, color: Colors.black),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Jogador 2: $nome2',
-              style: const TextStyle(fontSize: 22, color: Colors.black),
-            ),
-            const SizedBox(height: 400),
-          ],
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+          child: Column(
+            children: [
+              const SizedBox(height: 80), // Increased from 20 to 80
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  playerCard(nome1, foto1),
+                  Image.asset(
+                    'assets/images/fite.png',
+                    width: 90, // Increased from 50 to 80
+                  ),
+                  playerCard(nome2, foto2),
+                ],
+              ),
+              const Spacer(),
+              Text(
+                carregandoTexto,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Os parasitas são tipo aqueles amigos folgados: entram na sua casa, comem sua comida e nunca vão embora.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black54,
+                ),
+              ),
+              const SizedBox(height: 30),
+            ],
+          ),
         ),
-      ),
+      ],
+    );
+  }
+
+  Widget playerCard(String nome, String? foto) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 60, // Increased from 40 to 50
+          backgroundColor: Colors.grey.shade200,
+          backgroundImage: foto != null && foto.isNotEmpty
+              ? AssetImage(foto)
+              : const AssetImage('assets/images/gatopreto.png'),
+        ),
+        const SizedBox(height: 16), // Increased from 8 to 12
+        Text(
+          nome,
+          style: const TextStyle(
+            fontSize: 26, // Increased from 18 to 22
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }
