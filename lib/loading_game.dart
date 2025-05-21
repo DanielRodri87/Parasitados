@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io'; // Importação necessária para usar File
 import 'package:flutter/material.dart';
 import 'login_database.dart';
 import 'home.dart';
@@ -202,14 +203,14 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
           child: Column(
             children: [
-              const SizedBox(height: 80), // Increased from 20 to 80
+              const SizedBox(height: 80), 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   playerCard(nome1, foto1),
                   Image.asset(
                     'assets/images/fite.png',
-                    width: 90, // Increased from 50 to 80
+                    width: 90,
                   ),
                   playerCard(nome2, foto2),
                 ],
@@ -243,17 +244,17 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
     return Column(
       children: [
         CircleAvatar(
-          radius: 60, // Increased from 40 to 50
+          radius: 60,
           backgroundColor: Colors.grey.shade200,
-          backgroundImage: foto != null && foto.isNotEmpty
-              ? AssetImage(foto)
-              : const AssetImage('assets/images/gatopreto.png'),
+          backgroundImage: (foto != null && foto.isNotEmpty)
+              ? FileImage(File(foto)) // Use FileImage para caminhos de arquivo
+              : const AssetImage('assets/images/gatopreto.png') as ImageProvider,
         ),
-        const SizedBox(height: 16), // Increased from 8 to 12
+        const SizedBox(height: 16),
         Text(
           nome,
           style: const TextStyle(
-            fontSize: 26, // Increased from 18 to 22
+            fontSize: 26,
             fontWeight: FontWeight.w600,
           ),
         ),
