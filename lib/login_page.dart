@@ -4,6 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:sqflite/sqflite.dart';
 import 'loading_game.dart';
 import 'login_database.dart';
+import 'add_questions.dart';
+
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -12,6 +14,16 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const QuestionScreen()),
+          );
+        },
+        backgroundColor: const Color(0xFF00DB8F),
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -138,10 +150,12 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
                             try {
                               await salvarNoBanco();
                               Navigator.push(
+                                // ignore: use_build_context_synchronously
                                 context,
                                 MaterialPageRoute(builder: (context) => const LoadingGamePage()),
                               );
                             } catch (e) {
+                              // ignore: use_build_context_synchronously
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text('Erro ao salvar os dados: $e')),
                               );

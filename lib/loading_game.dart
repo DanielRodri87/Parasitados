@@ -45,7 +45,8 @@ class _LoadingGamePageState extends State<LoadingGamePage> {
   }
 
   void iniciarTemporizador() {
-    Future.delayed(const Duration(seconds: 30), () {
+    Timer(const Duration(seconds: 30), () {
+      if (!mounted) return;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomePage()),
@@ -57,6 +58,8 @@ class _LoadingGamePageState extends State<LoadingGamePage> {
     try {
       final db = await LoginDatabase().database;
       final resultado = await db.query('login', limit: 1);
+
+      if (!mounted) return;
 
       if (resultado.isNotEmpty) {
         final dados = resultado.first;
@@ -73,10 +76,15 @@ class _LoadingGamePageState extends State<LoadingGamePage> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao carregar os dados: $e')),
-      );
+      if (!mounted) return;
+      _mostrarErro('Erro ao carregar os dados: $e');
     }
+  }
+
+  void _mostrarErro(String mensagem) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(mensagem)),
+    );
   }
 
   @override
@@ -155,7 +163,8 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
   }
 
   void iniciarTemporizador() {
-    Future.delayed(const Duration(seconds: 10), () {
+    Timer(const Duration(seconds: 10), () {
+      if (!mounted) return;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomePage()),
@@ -167,6 +176,8 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
     try {
       final db = await LoginDatabase().database;
       final resultado = await db.query('login', limit: 1);
+
+      if (!mounted) return;
 
       if (resultado.isNotEmpty) {
         final dados = resultado.first;
@@ -183,10 +194,15 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao carregar os dados: $e')),
-      );
+      if (!mounted) return;
+      _mostrarErro('Erro ao carregar os dados: $e');
     }
+  }
+
+  void _mostrarErro(String mensagem) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(mensagem)),
+    );
   }
 
   @override
