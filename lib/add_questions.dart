@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'database.dart';
 
 class QuestionScreen extends StatefulWidget {
   const QuestionScreen({super.key});
@@ -9,6 +10,58 @@ class QuestionScreen extends StatefulWidget {
 
 class _QuestionScreenState extends State<QuestionScreen> {
   int? selectedOption;
+
+  final TextEditingController enunciadoController = TextEditingController();
+  final TextEditingController opcaoAController = TextEditingController();
+  final TextEditingController opcaoBController = TextEditingController();
+  final TextEditingController opcaoCController = TextEditingController();
+  final TextEditingController opcaoDController = TextEditingController();
+
+  final LoginDatabase dbHelper = LoginDatabase();
+
+  Future<void> _cadastrarQuestao() async {
+    final enunciado = enunciadoController.text.trim();
+    final opcaoA = opcaoAController.text.trim();
+    final opcaoB = opcaoBController.text.trim();
+    final opcaoC = opcaoCController.text.trim();
+    final opcaoD = opcaoDController.text.trim();
+
+    if (enunciado.isEmpty ||
+        opcaoA.isEmpty ||
+        opcaoB.isEmpty ||
+        opcaoC.isEmpty ||
+        opcaoD.isEmpty ||
+        selectedOption == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preencha todos os campos e selecione a correta')),
+      );
+      return;
+    }
+
+    final db = await dbHelper.database;
+    await db.insert('questions', {
+      'enunciado': enunciado,
+      'opcao_a': opcaoA,
+      'opcao_b': opcaoB,
+      'opcao_c': opcaoC,
+      'opcao_d': opcaoD,
+      'resposta_correta': selectedOption,
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Questão cadastrada com sucesso')),
+    );
+
+    // Limpar campos
+    enunciadoController.clear();
+    opcaoAController.clear();
+    opcaoBController.clear();
+    opcaoCController.clear();
+    opcaoDController.clear();
+    setState(() {
+      selectedOption = null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,17 +92,13 @@ class _QuestionScreenState extends State<QuestionScreen> {
         child: Center(
           child: SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(16.0, MediaQuery.of(context).padding.top + 40, 16.0, 16.0), // reduced top padding
+              padding: EdgeInsets.fromLTRB(16.0, MediaQuery.of(context).padding.top + 40, 16.0, 16.0),
               child: Column(
                 children: [
-                  // Logo
-                  Image.asset(
-                    'assets/images/LogoApp.png',
-                    height: 230, // back to original size
-                  ),
-                  const SizedBox(height: 10), // reduced spacing
+                  Image.asset('assets/images/LogoApp.png', height: 230),
+                  const SizedBox(height: 10),
 
-                  // Card do enunciado
+                  // Enunciado
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -57,21 +106,21 @@ class _QuestionScreenState extends State<QuestionScreen> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: TextField(
+                      controller: enunciadoController,
                       maxLines: 5,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Digite o enunciado aqui...',
-                        border: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.black),
-                        ),
+                        border: OutlineInputBorder(),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10), // reduced spacing
+                  const SizedBox(height: 10),
 
                   // Opções
                   OptionTile(
+                    controller: opcaoAController,
                     optionLetter: 'A',
-                    hint: 'Digite a letra A',
+                    hint: 'Digite a alternativa A',
                     value: 1,
                     groupValue: selectedOption,
                     onChanged: (value) {
@@ -82,8 +131,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   ),
                   const SizedBox(height: 10),
                   OptionTile(
+                    controller: opcaoBController,
                     optionLetter: 'B',
-                    hint: 'Digite a letra B',
+                    hint: 'Digite a alternativa B',
                     value: 2,
                     groupValue: selectedOption,
                     onChanged: (value) {
@@ -94,8 +144,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   ),
                   const SizedBox(height: 10),
                   OptionTile(
+                    controller: opcaoCController,
                     optionLetter: 'C',
-                    hint: 'Digite a letra C',
+                    hint: 'Digite a alternativa C',
                     value: 3,
                     groupValue: selectedOption,
                     onChanged: (value) {
@@ -106,8 +157,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   ),
                   const SizedBox(height: 10),
                   OptionTile(
+                    controller: opcaoDController,
                     optionLetter: 'D',
-                    hint: 'Digite a letra D',
+                    hint: 'Digite a alternativa D',
                     value: 4,
                     groupValue: selectedOption,
                     onChanged: (value) {
@@ -116,14 +168,14 @@ class _QuestionScreenState extends State<QuestionScreen> {
                       });
                     },
                   ),
-                  const SizedBox(height: 20), // adjusted final spacing
+                  const SizedBox(height: 20),
+
+                  // Botão Cadastrar
                   SizedBox(
-                    width: 200, // reduced from double.infinity
-                    height: 45, // reduced from 50
+                    width: 200,
+                    height: 45,
                     child: ElevatedButton(
-                      onPressed: () {
-                        // TODO: Implementar lógica de cadastro
-                      },
+                      onPressed: _cadastrarQuestao,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF00DB8F),
                         shape: RoundedRectangleBorder(
@@ -150,8 +202,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
   }
 }
 
-// Widget para as opções
+// 🔥 Widget das opções com TextField + RadioButton
 class OptionTile extends StatelessWidget {
+  final TextEditingController controller;
   final String optionLetter;
   final String hint;
   final int value;
@@ -160,6 +213,7 @@ class OptionTile extends StatelessWidget {
 
   const OptionTile({
     super.key,
+    required this.controller,
     required this.optionLetter,
     required this.hint,
     required this.value,
@@ -177,7 +231,6 @@ class OptionTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Círculo com a letra
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             width: 40,
@@ -205,18 +258,15 @@ class OptionTile extends StatelessWidget {
               ),
             ),
           ),
-
-          // Campo de texto
           Expanded(
             child: TextField(
+              controller: controller,
               decoration: InputDecoration(
                 hintText: hint,
                 border: InputBorder.none,
               ),
             ),
           ),
-
-          // Radio button
           Radio<int>(
             value: value,
             groupValue: groupValue,

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sqflite/sqflite.dart';
 import 'loading_game.dart';
-import 'login_database.dart';
+import 'database.dart';
 import 'add_questions.dart';
 
 

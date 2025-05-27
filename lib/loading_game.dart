@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io'; // Importação necessária para usar File
 import 'package:flutter/material.dart';
-import 'login_database.dart';
+import 'database.dart';
 import 'home.dart';
 
 class LoadingGamePage extends StatefulWidget {
