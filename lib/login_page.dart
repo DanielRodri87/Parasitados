@@ -5,6 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import 'loading_game.dart';
 import 'database.dart';
 import 'add_questions.dart';
+import 'about.dart'; // Adicione esta importação
 
 
 class LoginPage extends StatelessWidget {
@@ -82,17 +83,17 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
 
     final db = await LoginDatabase().database;
 
-  await db.insert(
-    'login',
-    {
-      'id': 1, // Sempre sobrescrevendo este registro
-      'nome1': nome1,
-      'nome2': nome2,
-      'foto1': foto1.isNotEmpty ? foto1 : null,
-      'foto2': foto2.isNotEmpty ? foto2 : null,
-    },
-    conflictAlgorithm: ConflictAlgorithm.replace,
-  );
+    await db.insert(
+      'login',
+      {
+        'id': 1, // Sempre sobrescrevendo este registro
+        'nome1': nome1,
+        'nome2': nome2,
+        'foto1': foto1.isNotEmpty ? foto1 : null,
+        'foto2': foto2.isNotEmpty ? foto2 : null,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   @override
@@ -179,7 +180,13 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
                   ),
                   const SizedBox(height: 20),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // Navegação para a tela about.dart
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LadoparScreen()),
+                      );
+                    },
                     child: const Text(
                       'Entre em Contato\nSobre Nós',
                       textAlign: TextAlign.center,

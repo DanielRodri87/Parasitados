@@ -62,6 +62,9 @@ flutter:
     - assets/images/user.png
     - assets/images/back_login.png
     - assets/images/fite.png
+    - assets/images/pulgo.png
+    - assets/images/carraputo.png
+    - assets/images/logo_ladopar.png
 
 
   # The following line ensures that the Material Icons font is
