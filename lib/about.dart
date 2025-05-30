@@ -10,8 +10,9 @@ class LadoparScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            // Cabeçalho com carrapato e botões
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 20), // Increased vertical padding
+              padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFF010D47), Color(0xFF07051A)],
@@ -21,7 +22,6 @@ class LadoparScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  const SizedBox(height: 30), // Increased spacing
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: const [
@@ -30,65 +30,34 @@ class LadoparScreen extends StatelessWidget {
                       SocialButton(text: 'GitHub'),
                     ],
                   ),
-                  const SizedBox(height: 60), // Increased spacing here
-                  Stack(
-                    clipBehavior: Clip.none, // Add this to prevent clipping
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 80), // Increased from 40 to 60
-                        child: const Text(
-                          'BEM-VINDO\n                  AO LADOPAR!',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.left,
-                        ),
-                      ),
-                      Positioned(
-                        top: -8, // Adjusted to move up more
-                        right: 20,
-                        child: Image.asset(
-                          'assets/images/carraputo.png',
-                          height: 140,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: 10,
-                              width: 10,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(Icons.image, color: Colors.white, size: 60),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 20),
+                  Image.asset(
+                    'assets/images/carraputo.png',
+                    height: 120,
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'BEM-VINDO AO LADOPAR!',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
             ),
+
+            // Seção do Pulgo
             Container(
               color: Colors.white,
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
                   Image.asset(
-                    'assets/images/pulgo.png',  // Updated path
+                    'assets/images/pulgo.png',
                     height: 200,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 200,
-                        width: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(Icons.pets, color: Colors.grey, size: 100),
-                      );
-                    },
                   ),
                   const SizedBox(height: 20),
                   Container(
@@ -96,10 +65,7 @@ class LadoparScreen extends StatelessWidget {
                       vertical: 8,
                       horizontal: 16,
                     ),
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
+                    color: Colors.black,
                     child: const Text(
                       'Olá, sou o Pulgo!',
                       style: TextStyle(
@@ -122,6 +88,8 @@ class LadoparScreen extends StatelessWidget {
                 ],
               ),
             ),
+
+            // Seção de informações do LADOPAR
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -153,19 +121,8 @@ class LadoparScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Image.asset(
-                    'assets/images/logo_ladopar.png',  // Updated path
+                    'assets/images/logo.png', // Substituir pelo logo correto
                     height: 80,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 80,
-                        width: 80,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(Icons.science, color: Colors.white, size: 40),
-                      );
-                    },
                   ),
                   const SizedBox(height: 15),
                   const Text(
@@ -203,21 +160,9 @@ class SocialButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
-      onPressed: () {
-        // Aqui você pode adicionar as ações específicas para cada botão
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('$text em desenvolvimento'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      },
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 12),
-      ),
+      onPressed: () {},
+      child: Text(text),
     );
   }
 }
