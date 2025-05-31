@@ -65,7 +65,14 @@ flutter:
     - assets/images/pulgo.png
     - assets/images/carraputo.png
     - assets/images/logo_ladopar.png
-
+    - assets/images/azul_cinza.png
+    - assets/images/barata_cinza.png
+    - assets/images/minhoca_cinza.png
+    - assets/images/azul.png
+    - assets/images/barata.png
+    - assets/images/minhoca.png
+    - assets/images/carregando.png
+    - assets/images/roleta.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
