@@ -163,68 +163,40 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         return Dialog(
           backgroundColor: Colors.transparent,
           child: Container(
+            margin: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.purple.shade400,
-                  Colors.blue.shade400,
-                  Colors.teal.shade400,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
                 ),
               ],
             ),
             child: Stack(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.all(32.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const SizedBox(height: 20),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          result == 'passar_vez' ? 'Ops!' : 'Você tirou:',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      const SizedBox(height: 10),
+                      Text(
+                        result == 'passar_vez' ? 'Passou a vez!' : 'Você tirou:',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
                       if (result != 'passar_vez') ...[
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 10,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: Image.asset(
-                            coloredAnimalImages[result]!,
-                            width: 80,
-                            height: 80,
-                          ),
+                        Image.asset(
+                          coloredAnimalImages[result]!,
+                          width: 100,
+                          height: 100,
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -232,63 +204,59 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.black87,
                           ),
                         ),
                       ] else ...[
                         Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 10,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
+                            color: const Color(0xFF81DC6E).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(50),
                           ),
                           child: const Icon(
-                            Icons.skip_next,
+                            Icons.skip_next_rounded,
                             size: 60,
-                            color: Colors.orange,
+                            color: Color(0xFF81DC6E),
                           ),
                         ),
                         const SizedBox(height: 16),
                         const Text(
-                          'Passar a vez',
+                          'Próximo jogador',
                           style: TextStyle(
-                            fontSize: 24,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.black87,
                           ),
                         ),
                       ],
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          if (result != 'passar_vez') {
-                            _respond();
-                          } else {
-                            _passTheTurn();
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.purple.shade400,
-                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
+                      const SizedBox(height: 32),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            if (result != 'passar_vez') {
+                              _respond();
+                            } else {
+                              _passTheTurn();
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF69D1E9),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
                           ),
-                          elevation: 5,
-                        ),
-                        child: Text(
-                          result == 'passar_vez' ? 'Passar a vez' : 'Responder',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                          child: Text(
+                            result == 'passar_vez' ? 'Continuar' : 'Responder',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
@@ -296,8 +264,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                 ),
                 Positioned(
-                  top: 8,
-                  right: 8,
+                  top: 12,
+                  right: 12,
                   child: IconButton(
                     onPressed: () {
                       Navigator.of(context).pop();
@@ -305,17 +273,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         _passTheTurn();
                       }
                     },
-                    icon: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: const Icon(
-                        Icons.close,
-                        color: Colors.white,
-                        size: 20,
-                      ),
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.grey,
+                      size: 24,
                     ),
                   ),
                 ),
