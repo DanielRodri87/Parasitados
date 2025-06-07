@@ -1,9 +1,10 @@
 import 'dart:math';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as path_package;
+import 'questions_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -296,71 +297,134 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _respond() {
-    setState(() {
-      isLoading = true;
-    });
+    if (selectedAnimal == null || selectedAnimal == 'passar_vez') return;
     
-    // Simulate loading and response validation
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        isLoading = false;
-        hasAnswered = true;
-        
-        // Simula que o usuário sempre acerta (retorna true)
-        // Aqui você integraria com a tela de resposta real
-        bool userAnsweredCorrectly = true;
-        
-        if (userAnsweredCorrectly && selectedAnimal != null) {
-          // Adiciona a conquista apenas se acertou
-          if (currentPlayer == 'Jogador 1') {
-            if (!player1Animals.contains(selectedAnimal!)) {
-              player1Animals.add(selectedAnimal!);
-            }
-          } else {
-            if (!player2Animals.contains(selectedAnimal!)) {
-              player2Animals.add(selectedAnimal!);
-            }
-          }
-          
-          // Verifica se alguém ganhou
-          _checkForWinner();
-        } else {
-          // Se errou, muda o jogador
-          currentPlayer = currentPlayer == 'Jogador 1' ? 'Jogador 2' : 'Jogador 1';
-        }
-        
-        selectedAnimal = null; // Reset para próxima rodada
-      });
-    });
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => QuestionScreen(
+          animal: selectedAnimal!,
+          onAnswer: (bool isCorrect) {
+            setState(() {
+              if (isCorrect) {
+                // Adiciona a conquista apenas se acertou
+                if (currentPlayer == 'Jogador 1') {
+                  if (!player1Animals.contains(selectedAnimal!)) {
+                    player1Animals.add(selectedAnimal!);
+                  }
+                } else {
+                  if (!player2Animals.contains(selectedAnimal!)) {
+                    player2Animals.add(selectedAnimal!);
+                  }
+                }
+                // Verifica se alguém ganhou
+                _checkForWinner();
+              } else {
+                // Se errou, muda o jogador
+                currentPlayer = currentPlayer == 'Jogador 1' ? 'Jogador 2' : 'Jogador 1';
+              }
+              selectedAnimal = null; // Reset para próxima rodada
+            });
+          },
+          player1Name: player1Name,
+          player2Name: player2Name,
+          player1Photo: player1Photo,
+          player2Photo: player2Photo,
+          currentPlayer: currentPlayer,
+        ),
+      ),
+    );
   }
 
-  Widget _buildPlayerInfo(String name, String? photo, List<String> achievedAnimals) {
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 45,
-          backgroundColor: Colors.grey.shade200,
-          backgroundImage: (photo != null && photo.isNotEmpty)
-              ? FileImage(File(photo))
-              : const AssetImage('assets/images/gatopreto.png') as ImageProvider,
+  Widget _buildPlayerInfo(String name, String? photo, List<String> achievedAnimals, bool isCurrentPlayer) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        decoration: BoxDecoration(
+          gradient: isCurrentPlayer 
+            ? LinearGradient(
+                colors: [
+                  const Color(0xFF69D1E9).withOpacity(0.2),
+                  const Color(0xFF81DC6E).withOpacity(0.2),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : null,
+          borderRadius: BorderRadius.circular(12),
+          border: isCurrentPlayer 
+            ? Border.all(color: const Color(0xFF69D1E9), width: 2)
+            : null,
         ),
-        const SizedBox(height: 8),
-        Text(name),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: animals.map((animal) {
-            final bool isAchieved = achievedAnimals.contains(animal);
-            return Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Image.asset(
-                isAchieved ? coloredAnimalImages[animal]! : grayAnimalImages[animal]!,
-                width: 30,
-                height: 30,
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Colors.grey.shade200,
+                  backgroundImage: (photo != null && photo.isNotEmpty)
+                      ? FileImage(File(photo))
+                      : const AssetImage('assets/images/gatopreto.png') as ImageProvider,
+                ),
+                if (isCurrentPlayer)
+                  Positioned(
+                    bottom: -2,
+                    right: -2,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF69D1E9),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.play_arrow,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              name,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: isCurrentPlayer ? const Color(0xFF69D1E9) : Colors.black87,
               ),
-            );
-          }).toList(),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: animals.map((animal) {
+                final bool isAchieved = achievedAnimals.contains(animal);
+                return Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isAchieved 
+                        ? const Color(0xFF81DC6E).withOpacity(0.2)
+                        : Colors.grey.withOpacity(0.1),
+                    ),
+                    child: Image.asset(
+                      isAchieved ? coloredAnimalImages[animal]! : grayAnimalImages[animal]!,
+                      width: 20,
+                      height: 20,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
@@ -531,97 +595,226 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    // Players Card
+                    // Players Card - Centralizado
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      child: Card(
-                        elevation: 5,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              Text(
-                                'Vez de: $currentPlayer',
-                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 20),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  _buildPlayerInfo(player1Name, player1Photo, player1Animals),
-                                  _buildPlayerInfo(player2Name, player2Photo, player2Animals),
-                                ],
-                              ),
-                            ],
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
                           ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          children: [
+                            const Text(
+                              'JOGADORES',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.2,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                _buildPlayerInfo(
+                                  player1Name, 
+                                  player1Photo, 
+                                  player1Animals, 
+                                  currentPlayer == 'Jogador 1'
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: Image.asset(
+                                    'assets/images/vs.png',
+                                    height: 40,
+                                  ),
+                                ),
+                                _buildPlayerInfo(
+                                  player2Name, 
+                                  player2Photo, 
+                                  player2Animals, 
+                                  currentPlayer == 'Jogador 2'
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Game Card
+                    // Game Card - Expandido e moderno
                     Expanded(
                       child: Container(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        child: Card(
-                          elevation: 5,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // Stack para sobrepor a seta à roleta
-                                Expanded(
-                                  child: Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      // Roleta (aumentada)
-                                      GestureDetector(
-                                        onTap: _spinWheel,
-                                        child: RotationTransition(
-                                          turns: _animation,
-                                          child: Image.asset(
-                                            'assets/images/roleta.png',
-                                            width: 280,
-                                            height: 280,
-                                            fit: BoxFit.contain,
-                                          ),
-                                        ),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Stack(
+                          children: [
+                            // Padrão de fundo sutil
+                            Positioned.fill(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Colors.blue.withOpacity(0.02),
+                                      Colors.green.withOpacity(0.02),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            // Círculos decorativos
+                            Positioned(
+                              top: -20,
+                              right: -20,
+                              child: Container(
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: const Color(0xFF69D1E9).withOpacity(0.1),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: -30,
+                              left: -30,
+                              child: Container(
+                                width: 120,
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: const Color(0xFF81DC6E).withOpacity(0.1),
+                                ),
+                              ),
+                            ),
+                            // Conteúdo principal
+                            Padding(
+                              padding: const EdgeInsets.all(24.0),
+                              child: Column(
+                                children: [
+                                  // Indicador da vez do jogador
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [Color(0xFF69D1E9), Color(0xFF81DC6E)],
                                       ),
-                                      // Seta apontando para baixo (fixa)
-                                      Positioned(
-                                        bottom: 20,
+                                      borderRadius: BorderRadius.circular(25),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFF69D1E9).withOpacity(0.3),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Text(
+                                      'VEZ DE: ${currentPlayer.toUpperCase()}',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        letterSpacing: 1.5,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  // Roleta (aumentada e centralizada)
+                                  Expanded(
+                                    child: Center(
+                                      child: GestureDetector(
+                                        onTap: _spinWheel,
                                         child: Container(
-                                          width: 0,
-                                          height: 0,
-                                          decoration: const BoxDecoration(
-                                            border: Border(
-                                              left: BorderSide(width: 15, color: Colors.transparent),
-                                              right: BorderSide(width: 15, color: Colors.transparent),
-                                              bottom: BorderSide(width: 25, color: Colors.red),
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(0.15),
+                                                blurRadius: 20,
+                                                offset: const Offset(0, 8),
+                                              ),
+                                            ],
+                                          ),
+                                          child: RotationTransition(
+                                            turns: _animation,
+                                            child: Image.asset(
+                                              'assets/images/roleta.png',
+                                              width: 320,
+                                              height: 320,
+                                              fit: BoxFit.contain,
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 20),
-                                if (isLoading)
-                                  const Column(
-                                    children: [
-                                      CircularProgressIndicator(
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                                      ),
-                                      SizedBox(height: 16),
-                                      Text(
-                                        'Verificando resposta...',
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                    ],
+                                  // Área de loading/status
+                                  Container(
+                                    height: 80,
+                                    child: Center(
+                                      child: isLoading
+                                          ? Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Image.asset(
+                                                  'assets/images/carregando.png',
+                                                  width: 40,
+                                                  height: 40,
+                                                ),
+                                                const SizedBox(height: 8),
+                                                const Text(
+                                                  'Verificando resposta...',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.grey,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey.withOpacity(0.1),
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                              child: const Text(
+                                                '🎯 Toque na roleta para girar!',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.grey,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                    ),
                                   ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
                     ),
