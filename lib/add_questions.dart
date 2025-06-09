@@ -20,47 +20,57 @@ class _QuestionScreenState extends State<QuestionScreen> {
   final LoginDatabase dbHelper = LoginDatabase();
 
   Future<void> _cadastrarQuestao() async {
-    final enunciado = enunciadoController.text.trim();
-    final opcaoA = opcaoAController.text.trim();
-    final opcaoB = opcaoBController.text.trim();
-    final opcaoC = opcaoCController.text.trim();
-    final opcaoD = opcaoDController.text.trim();
+    try {
+      final enunciado = enunciadoController.text.trim();
+      final opcaoA = opcaoAController.text.trim();
+      final opcaoB = opcaoBController.text.trim();
+      final opcaoC = opcaoCController.text.trim();
+      final opcaoD = opcaoDController.text.trim();
 
-    if (enunciado.isEmpty ||
-        opcaoA.isEmpty ||
-        opcaoB.isEmpty ||
-        opcaoC.isEmpty ||
-        opcaoD.isEmpty ||
-        selectedOption == null) {
+      if (enunciado.isEmpty ||
+          opcaoA.isEmpty ||
+          opcaoB.isEmpty ||
+          opcaoC.isEmpty ||
+          opcaoD.isEmpty ||
+          selectedOption == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Preencha todos os campos e selecione a correta')),
+        );
+        return;
+      }
+
+      final db = await dbHelper.database;
+      
+      await db.insert('questions', {
+        'enunciado': enunciado,
+        'opcao_a': opcaoA,
+        'opcao_b': opcaoB,
+        'opcao_c': opcaoC,
+        'opcao_d': opcaoD,
+        'resposta_correta': selectedOption,
+      });
+
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preencha todos os campos e selecione a correta')),
+        const SnackBar(content: Text('Questão cadastrada com sucesso')),
       );
-      return;
+
+      // Limpar campos
+      enunciadoController.clear();
+      opcaoAController.clear();
+      opcaoBController.clear();
+      opcaoCController.clear();
+      opcaoDController.clear();
+      setState(() {
+        selectedOption = null;
+      });
+
+    } catch (e) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao cadastrar questão: $e')),
+      );
     }
-
-    final db = await dbHelper.database;
-    await db.insert('questions', {
-      'enunciado': enunciado,
-      'opcao_a': opcaoA,
-      'opcao_b': opcaoB,
-      'opcao_c': opcaoC,
-      'opcao_d': opcaoD,
-      'resposta_correta': selectedOption,
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Questão cadastrada com sucesso')),
-    );
-
-    // Limpar campos
-    enunciadoController.clear();
-    opcaoAController.clear();
-    opcaoBController.clear();
-    opcaoCController.clear();
-    opcaoDController.clear();
-    setState(() {
-      selectedOption = null;
-    });
   }
 
   @override
