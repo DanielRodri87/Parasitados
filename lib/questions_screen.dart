@@ -124,87 +124,79 @@ class _QuestionScreenState extends State<QuestionScreen>
   Future<bool> _showFeedbackDialog() async {
     return await showDialog<bool>(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: false, // Previne fechar ao clicar fora
       builder: (BuildContext context) {
-        return GestureDetector(
-          onTap: () => Navigator.of(context).pop(false), // Fecha o dialog sem confirmar
+        return WillPopScope( // Previne o botão de voltar
+          onWillPop: () async => false,
           child: ScaleTransition(
             scale: _scaleAnimation,
             child: AlertDialog(
               backgroundColor: Colors.transparent,
               elevation: 0,
-              content: GestureDetector(
-                onTap: () {}, // Previne que o tap se propague
+              content: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: isAnswerCorrect!
+                        ? [Colors.green.shade300, Colors.green.shade500]
+                        : [Colors.red.shade300, Colors.red.shade500],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: isAnswerCorrect!
-                              ? [Colors.green.shade300, Colors.green.shade500]
-                              : [Colors.red.shade300, Colors.red.shade500],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
+                    Icon(
+                      isAnswerCorrect! ? Icons.check_circle : Icons.cancel,
+                      size: 80,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      isAnswerCorrect! ? 'Parabéns!' : 'Ops!',
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isAnswerCorrect! ? Icons.check_circle : Icons.cancel,
-                            size: 80,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            isAnswerCorrect! ? 'Parabéns!' : 'Ops!',
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            isAnswerCorrect! 
-                                ? 'Resposta correta! 🎉'
-                                : 'Resposta incorreta! 😢',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 24),
-                          ElevatedButton(
-                            onPressed: () => Navigator.of(context).pop(true), // Fecha com confirmação
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: isAnswerCorrect! ? Colors.green : Colors.red,
-                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                            ),
-                            child: const Text(
-                              'Continuar',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      isAnswerCorrect! 
+                          ? 'Resposta correta! 🎉'
+                          : 'Resposta incorreta! 😢',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: isAnswerCorrect! ? Colors.green : Colors.red,
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                      ),
+                      child: const Text(
+                        'Continuar',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
@@ -214,7 +206,7 @@ class _QuestionScreenState extends State<QuestionScreen>
           ),
         );
       },
-    ) ?? false; // Retorna false se o dialog for descartado
+    ) ?? false;
   }
 
   Widget _buildCurrentPlayerHeader() {
