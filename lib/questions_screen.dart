@@ -109,78 +109,112 @@ class _QuestionScreenState extends State<QuestionScreen>
       isAnswerCorrect = answer == currentQuestion!.respostaCorreta;
     });
 
-    // Mostra dialog de feedback
-    await _showFeedbackDialog();
+    // Mostra dialog de feedback e retorna resultado
+    bool shouldProceed = await _showFeedbackDialog();
     
-    // Retorna resultado
-    widget.onAnswer(isAnswerCorrect!);
-    Navigator.pop(context);
+    // Só procede se o dialog não foi descartado
+    if (shouldProceed) {
+      widget.onAnswer(isAnswerCorrect!);
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    }
   }
 
-  Future<void> _showFeedbackDialog() async {
-    return showDialog<void>(
+  Future<bool> _showFeedbackDialog() async {
+    return await showDialog<bool>(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (BuildContext context) {
-        return ScaleTransition(
-          scale: _scaleAnimation,
-          child: AlertDialog(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            content: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isAnswerCorrect!
-                      ? [Colors.green.shade300, Colors.green.shade500]
-                      : [Colors.red.shade300, Colors.red.shade500],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+        return GestureDetector(
+          onTap: () => Navigator.of(context).pop(false), // Fecha o dialog sem confirmar
+          child: ScaleTransition(
+            scale: _scaleAnimation,
+            child: AlertDialog(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              content: GestureDetector(
+                onTap: () {}, // Previne que o tap se propague
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: isAnswerCorrect!
+                              ? [Colors.green.shade300, Colors.green.shade500]
+                              : [Colors.red.shade300, Colors.red.shade500],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isAnswerCorrect! ? Icons.check_circle : Icons.cancel,
+                            size: 80,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            isAnswerCorrect! ? 'Parabéns!' : 'Ops!',
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            isAnswerCorrect! 
+                                ? 'Resposta correta! 🎉'
+                                : 'Resposta incorreta! 😢',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton(
+                            onPressed: () => Navigator.of(context).pop(true), // Fecha com confirmação
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: isAnswerCorrect! ? Colors.green : Colors.red,
+                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            ),
+                            child: const Text(
+                              'Continuar',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    isAnswerCorrect! ? Icons.check_circle : Icons.cancel,
-                    size: 80,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    isAnswerCorrect! ? 'Parabéns!' : 'Ops!',
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    isAnswerCorrect! 
-                        ? 'Resposta correta! 🎉'
-                        : 'Resposta incorreta! 😢',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
               ),
             ),
           ),
         );
       },
-    );
+    ) ?? false; // Retorna false se o dialog for descartado
   }
 
   Widget _buildCurrentPlayerHeader() {
@@ -188,15 +222,15 @@ class _QuestionScreenState extends State<QuestionScreen>
     final currentPlayerPhoto = isPlayer1 ? widget.player1Photo : widget.player2Photo;
     
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // reduced margin
+      padding: const EdgeInsets.all(12), // reduced padding
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF69D1E9), Color(0xFF81DC6E)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(15), // smaller radius
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -205,34 +239,41 @@ class _QuestionScreenState extends State<QuestionScreen>
           ),
         ],
       ),
-      child: Column(
+      child: Row( // changed to Row layout
         children: [
           CircleAvatar(
-            radius: 40,
+            radius: 25, // smaller radius
             backgroundColor: Colors.white,
             child: CircleAvatar(
-              radius: 35,
+              radius: 22, // smaller radius
               backgroundImage: (currentPlayerPhoto != null && currentPlayerPhoto.isNotEmpty)
                   ? FileImage(File(currentPlayerPhoto))
                   : const AssetImage('assets/images/gatopreto.png') as ImageProvider,
             ),
           ),
-          const SizedBox(height: 12),
-          Text(
-            widget.currentPlayer,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'Sua vez de responder!',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  widget.currentPlayer,
+                  style: const TextStyle(
+                    fontSize: 16, // smaller font
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const Text(
+                  'Sua vez de responder!',
+                  style: TextStyle(
+                    fontSize: 12, // smaller font
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -242,11 +283,11 @@ class _QuestionScreenState extends State<QuestionScreen>
 
   Widget _buildAnimalSection() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // reduced margin
+      padding: const EdgeInsets.all(12), // reduced padding
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(15), // smaller radius
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -255,24 +296,24 @@ class _QuestionScreenState extends State<QuestionScreen>
           ),
         ],
       ),
-      child: Column(
+      child: Row( // changed to Row layout
         children: [
           const Text(
             'Pergunta sobre:',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14, // smaller font
               color: Colors.grey,
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(width: 12),
           AnimatedBuilder(
             animation: _pulseAnimation,
             builder: (context, child) {
               return Transform.scale(
                 scale: _pulseAnimation.value,
                 child: Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(8), // reduced padding
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
@@ -286,19 +327,19 @@ class _QuestionScreenState extends State<QuestionScreen>
                   ),
                   child: Image.asset(
                     'assets/images/${widget.animal}.png',
-                    height: 60,
-                    width: 60,
+                    height: 40, // smaller size
+                    width: 40, // smaller size
                     fit: BoxFit.contain,
                   ),
                 ),
               );
             },
           ),
-          const SizedBox(height: 12),
+          const SizedBox(width: 12),
           Text(
             widget.animal,
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 16, // smaller font
               fontWeight: FontWeight.bold,
               color: Color(0xFF69D1E9),
             ),
