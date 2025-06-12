@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:parasitados/routes/routes.dart';
 import 'package:sqflite/sqflite.dart';
-import 'loading_game.dart';
-import 'database.dart';
-import 'add_questions.dart';
-import 'about.dart'; // Adicione esta importação
+import '../questions/loading_game.dart';
+import '../../database/database.dart';
+import '../about/about.dart'; // Adicione esta importação
 
 
 class LoginPage extends StatelessWidget {
@@ -17,10 +17,7 @@ class LoginPage extends StatelessWidget {
       resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const QuestionScreen()),
-          );
+          Navigator.pushNamed(context, Routes.addQuestion);
         },
         backgroundColor: const Color(0xFF00DB8F),
         child: const Icon(Icons.add, color: Colors.white),
