@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io'; // Importação necessária para usar File
+import 'dart:math' show Random;
 import 'package:flutter/material.dart';
 import '../../database/database.dart';
 import 'home.dart';
@@ -139,18 +140,31 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
   int pontoCount = 0;
   Timer? timer;
 
+  final List<String> frases = [
+    'Os parasitas são tipo aqueles amigos folgados: entram na sua casa, comem sua comida e nunca vão embora.',
+    'Bactéria é tipo visita que você nem chamou e ainda deixa a casa toda bagunçada.',
+    'Fungo é aquele colega de quarto que cresce no canto do banheiro e se recusa a sair.',
+    'Vírus é como ex tóxico: aparece do nada, se instala sem permissão e deixa você mal depois.',
+    'Piolho é tipo criança em festinha: vem em bando, gruda e só vai embora na base do grito (ou shampoo).',
+    'Tênia é aquele hóspede que come tudo, mas nunca engorda. Quem emagrece é você!',
+    'Ameba é tipo estagiário perdido: tá lá, ocupando espaço e ninguém sabe muito bem o que tá fazendo.',
+    'Carrapato é como cobrança de boleto: gruda e suga até o último centavo de energia.',
+    'Lombriga é o pet que você nunca pediu, mas que mora dentro de você.',
+    'Protozoário é aquele colega invisível que sempre atrasa o rolê com uma diarreia surpresa.',
+    'Pulga é tipo fofoqueiro: vive pulando de um canto pro outro e incomoda todo mundo.',
+  ];
+  int fraseAtual = 0;
+  Timer? timerFrases;
+
+  final _random = Random();
+
   @override
   void initState() {
     super.initState();
     carregarDados();
     iniciarAnimacaoTexto();
     iniciarTemporizador();
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
+    iniciarRotacaoFrases();
   }
 
   void iniciarAnimacaoTexto() {
@@ -169,6 +183,14 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
         context,
         MaterialPageRoute(builder: (context) => const HomePage()),
       );
+    });
+  }
+
+  void iniciarRotacaoFrases() {
+    timerFrases = Timer.periodic(const Duration(seconds: 5), (timer) {
+      setState(() {
+        fraseAtual = _random.nextInt(frases.length);
+      });
     });
   }
 
@@ -206,6 +228,13 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
   }
 
   @override
+  void dispose() {
+    timer?.cancel();
+    timerFrases?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
@@ -240,10 +269,10 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Os parasitas são tipo aqueles amigos folgados: entram na sua casa, comem sua comida e nunca vão embora.',
+              Text(
+                frases[fraseAtual],
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.black54,
                 ),
