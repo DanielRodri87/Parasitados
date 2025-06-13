@@ -207,19 +207,21 @@ class _QuestionScreenState extends State<QuestionScreen>
   }
 
   Widget _buildCurrentPlayerHeader() {
+    // Identifica qual jogador está jogando
     final isPlayer1 = widget.currentPlayer == widget.player1Name;
+    final currentPlayerName = isPlayer1 ? widget.player1Name : widget.player2Name;
     final currentPlayerPhoto = isPlayer1 ? widget.player1Photo : widget.player2Photo;
     
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // reduced margin
-      padding: const EdgeInsets.all(12), // reduced padding
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF69D1E9), Color(0xFF81DC6E)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(15), // smaller radius
+        borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha((0.1 * 255).toInt()),
@@ -228,13 +230,13 @@ class _QuestionScreenState extends State<QuestionScreen>
           ),
         ],
       ),
-      child: Row( // changed to Row layout
+      child: Row(
         children: [
           CircleAvatar(
-            radius: 25, // smaller radius
+            radius: 25,
             backgroundColor: Colors.white,
             child: CircleAvatar(
-              radius: 22, // smaller radius
+              radius: 22,
               backgroundImage: (currentPlayerPhoto != null && currentPlayerPhoto.isNotEmpty)
                   ? FileImage(File(currentPlayerPhoto))
                   : const AssetImage('assets/images/gatopreto.png') as ImageProvider,
@@ -247,9 +249,9 @@ class _QuestionScreenState extends State<QuestionScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  widget.currentPlayer,
+                  currentPlayerName, // Usando o nome real do jogador
                   style: const TextStyle(
-                    fontSize: 16, // smaller font
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -257,7 +259,7 @@ class _QuestionScreenState extends State<QuestionScreen>
                 const Text(
                   'Sua vez de responder!',
                   style: TextStyle(
-                    fontSize: 12, // smaller font
+                    fontSize: 12,
                     color: Colors.white,
                     fontWeight: FontWeight.w500,
                   ),
@@ -340,35 +342,53 @@ class _QuestionScreenState extends State<QuestionScreen>
 
   Widget _buildQuestionCard() {
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.white,
-            const Color(0xFF69D1E9).withAlpha((0.05 * 255).toInt()),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
+          // Sombra superior mais clara
           BoxShadow(
-            color: Colors.black.withAlpha((0.1 * 255).toInt()),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+            color: Colors.black.withAlpha((0.03 * 255).toInt()), // Reduzido de 0.05
+            offset: const Offset(0, -2),
+            blurRadius: 8,
+          ),
+          // Sombra inferior mais suave
+          BoxShadow(
+            color: Colors.black.withAlpha((0.08 * 255).toInt()), // Reduzido de 0.2
+            offset: const Offset(0, 4),
+            blurRadius: 15, // Aumentado para suavizar
           ),
         ],
       ),
-      child: Text(
-        currentQuestion!.enunciado,
-        style: const TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-          color: Colors.black87,
-          height: 1.4,
+      child: Material(
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.white,
+                const Color(0xFF69D1E9).withAlpha((0.05 * 255).toInt()),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: SingleChildScrollView(
+            child: Text(
+              currentQuestion!.enunciado,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+                height: 1.4,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
         ),
-        textAlign: TextAlign.center,
       ),
     );
   }
@@ -523,35 +543,37 @@ class _QuestionScreenState extends State<QuestionScreen>
               
               const SizedBox(height: 20),
               
-              // Pergunta
-              if (!isLoading) _buildQuestionCard(),
-              const SizedBox(height: 20),
-              // Opções de resposta
-              if (!isLoading)
-                Expanded(
-                  child: ListView.builder(
-                    padding: EdgeInsets.zero,
-                    itemCount: currentQuestion!.opcoes.length,
-                    itemBuilder: (context, index) {
-                      // Suporta tanto lista de string quanto lista de mapas {"a": "texto"}
-                      final op = currentQuestion!.opcoes[index];
-                      String texto;
-                      String letra;
-                      if (op is Map && op.isNotEmpty) {
-                        letra = op.keys.first.toUpperCase();
-                        texto = op.values.first.toString();
-                      } else {
-                        letra = String.fromCharCode(65 + index); // A, B, C, D
-                        texto = op.toString();
-                      }
-                      return _buildAnswerOption(
-                        texto,
-                        index + 1,
-                        letra,
-                      );
-                    },
-                  ),
+              // Conteúdo principal em um layout flexível
+              if (!isLoading) Expanded(
+                child: Column(
+                  children: [
+                    _buildQuestionCard(),
+                    const SizedBox(height: 8), // Reduzido de 20 para 8
+                    // Área de respostas com scroll
+                    Expanded(
+                      flex: 4, // Aumentado de 3 para 4 para dar mais espaço às alternativas
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: currentQuestion!.opcoes.length,
+                        itemBuilder: (context, index) {
+                          final op = currentQuestion!.opcoes[index];
+                          String texto;
+                          String letra;
+                          if (op is Map && op.isNotEmpty) {
+                            letra = op.keys.first.toUpperCase();
+                            texto = op.values.first.toString();
+                          } else {
+                            letra = String.fromCharCode(65 + index);
+                            texto = op.toString();
+                          }
+                          return _buildAnswerOption(texto, index + 1, letra);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 8), // Reduzido de 16 para 8
+                  ],
                 ),
+              ),
               
               // Loading indicator
               if (isLoading)

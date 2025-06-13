@@ -76,6 +76,12 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _confettiAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _confettiController, curve: Curves.easeOut),
     );
+
+    _loadPlayers().then((_) {
+      setState(() {
+        currentPlayer = player1Name;
+      });
+    });
   }
 
   Future<void> _loadPlayers() async {
@@ -291,7 +297,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   void _passTheTurn() {
     setState(() {
-      currentPlayer = currentPlayer == 'Jogador 1' ? 'Jogador 2' : 'Jogador 1';
+      currentPlayer = currentPlayer == player1Name ? player2Name : player1Name;
       selectedAnimal = null;
     });
   }
@@ -308,7 +314,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             setState(() {
               if (isCorrect) {
                 // Adiciona a conquista apenas se acertou
-                if (currentPlayer == 'Jogador 1') {
+                if (currentPlayer == player1Name) {
                   if (!player1Animals.contains(selectedAnimal!)) {
                     player1Animals.add(selectedAnimal!);
                   }
@@ -321,7 +327,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 _checkForWinner();
               } else {
                 // Se errou, muda o jogador
-                currentPlayer = currentPlayer == 'Jogador 1' ? 'Jogador 2' : 'Jogador 1';
+                currentPlayer = currentPlayer == player1Name ? player2Name : player1Name;
               }
               selectedAnimal = null; // Reset para próxima rodada
             });
@@ -531,7 +537,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         winner = null;
                         player1Animals.clear();
                         player2Animals.clear();
-                        currentPlayer = 'Jogador 1';
+                        currentPlayer = player1Name;
                         selectedAnimal = null;
                       });
                       _confettiController.stop();
@@ -629,7 +635,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   player1Name, 
                                   player1Photo, 
                                   player1Animals, 
-                                  currentPlayer == 'Jogador 1'
+                                  currentPlayer == player1Name
                                 ),
                                 Container(
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -642,7 +648,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   player2Name, 
                                   player2Photo, 
                                   player2Animals, 
-                                  currentPlayer == 'Jogador 2'
+                                  currentPlayer == player2Name
                                 ),
                               ],
                             ),
