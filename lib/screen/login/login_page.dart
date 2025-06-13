@@ -146,10 +146,12 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
                             try {
                               await salvarNoBanco();
                               Navigator.push(
+                                // ignore: use_build_context_synchronously
                                 context,
                                 MaterialPageRoute(builder: (context) => const LoadingGamePage()),
                               );
                             } catch (e) {
+                              // ignore: use_build_context_synchronously
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text('Erro ao salvar os dados: $e')),
                               );
