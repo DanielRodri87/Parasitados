@@ -1,9 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart' as path_package;
-import 'models/question.dart';
+import 'package:parasitados/class/questions/questions.dart';
+import '../../class/questions/question.dart';
 
 class QuestionScreen extends StatefulWidget {
   final String animal;
@@ -84,18 +83,16 @@ class _QuestionScreenState extends State<QuestionScreen>
   }
 
   Future<void> _loadRandomQuestion() async {
-    final String databasesPath = await getDatabasesPath();
-    final String dbPath = path_package.join(databasesPath, 'login.db');
-    final db = await openDatabase(dbPath);
-
-    final List<Map<String, dynamic>> questions = await db.query('questions');
-    await db.close();
-
-    if (questions.isNotEmpty) {
+    // Carrega todas as questões do JSON
+    final questions = await Questions.fromJsonFile('assets/pdf/questions.json');
+    final questoesList = questions.questoes.values.toList();
+    if (questoesList.isNotEmpty) {
       final random = Random();
-      final questionMap = questions[random.nextInt(questions.length)];
+		final q = questoesList[random.nextInt(questoesList.length)];
+
+    //   final q = questoesList[Questions.id];
       setState(() {
-        currentQuestion = Question.fromMap(questionMap);
+        currentQuestion = q;
         isLoading = false;
       });
     }
@@ -126,85 +123,85 @@ class _QuestionScreenState extends State<QuestionScreen>
       context: context,
       barrierDismissible: false, // Previne fechar ao clicar fora
       builder: (BuildContext context) {
-        return WillPopScope( // Previne o botão de voltar
-          onWillPop: () async => false,
-          child: ScaleTransition(
-            scale: _scaleAnimation,
-            child: AlertDialog(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              content: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isAnswerCorrect!
-                        ? [Colors.green.shade300, Colors.green.shade500]
-                        : [Colors.red.shade300, Colors.red.shade500],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      isAnswerCorrect! ? Icons.check_circle : Icons.cancel,
-                      size: 80,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      isAnswerCorrect! ? 'Parabéns!' : 'Ops!',
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      isAnswerCorrect! 
-                          ? 'Resposta correta! 🎉'
-                          : 'Resposta incorreta! 😢',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: isAnswerCorrect! ? Colors.green : Colors.red,
-                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                      ),
-                      child: const Text(
-                        'Continuar',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
+		return PopScope( // Previne o botão de voltar
+		  canPop: false,
+		  child: ScaleTransition(
+			scale: _scaleAnimation,
+			child: AlertDialog(
+			  backgroundColor: Colors.transparent,
+			  elevation: 0,
+			  content: Container(
+			padding: const EdgeInsets.all(24),
+			decoration: BoxDecoration(
+			  gradient: LinearGradient(
+				colors: isAnswerCorrect!
+				? [Colors.green.shade300, Colors.green.shade500]
+				: [Colors.red.shade300, Colors.red.shade500],
+				begin: Alignment.topLeft,
+				end: Alignment.bottomRight,
+			  ),
+			  borderRadius: BorderRadius.circular(20),
+			  boxShadow: [
+				BoxShadow(
+				  color: Colors.black.withAlpha((0.2 * 255).toInt()),
+				  blurRadius: 20,
+				  offset: const Offset(0, 10),
+				),
+			  ],
+			),
+			child: Column(
+			  mainAxisSize: MainAxisSize.min,
+			  children: [
+				Icon(
+				  isAnswerCorrect! ? Icons.check_circle : Icons.cancel,
+				  size: 80,
+				  color: Colors.white,
+				),
+				const SizedBox(height: 16),
+				Text(
+				  isAnswerCorrect! ? 'Parabéns!' : 'Ops!',
+				  style: const TextStyle(
+				fontSize: 28,
+				fontWeight: FontWeight.bold,
+				color: Colors.white,
+				  ),
+				),
+				const SizedBox(height: 8),
+				Text(
+				  isAnswerCorrect! 
+				  ? 'Resposta correta! 🎉'
+				  : 'Resposta incorreta! 😢',
+				  style: const TextStyle(
+				fontSize: 18,
+				color: Colors.white,
+				  ),
+				  textAlign: TextAlign.center,
+				),
+				const SizedBox(height: 24),
+				ElevatedButton(
+				  onPressed: () => Navigator.of(context).pop(true),
+				  style: ElevatedButton.styleFrom(
+				backgroundColor: Colors.white,
+				foregroundColor: isAnswerCorrect! ? Colors.green : Colors.red,
+				padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+				shape: RoundedRectangleBorder(
+				  borderRadius: BorderRadius.circular(25),
+				),
+				  ),
+				  child: const Text(
+				'Continuar',
+			 style: TextStyle(
+				  fontSize: 16,
+				  fontWeight: FontWeight.bold,
+				),
+				  ),
+				),
+			  ],
+			),
+			  ),
+			),
+		  ),
+		);
       },
     ) ?? false;
   }
@@ -225,7 +222,7 @@ class _QuestionScreenState extends State<QuestionScreen>
         borderRadius: BorderRadius.circular(15), // smaller radius
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withAlpha((0.1 * 255).toInt()),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -282,7 +279,7 @@ class _QuestionScreenState extends State<QuestionScreen>
         borderRadius: BorderRadius.circular(15), // smaller radius
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withAlpha((0.1 * 255).toInt()),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -309,8 +306,8 @@ class _QuestionScreenState extends State<QuestionScreen>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        const Color(0xFF69D1E9).withOpacity(0.1),
-                        const Color(0xFF81DC6E).withOpacity(0.1),
+                        const Color(0xFF69D1E9).withAlpha((0.1 * 255).toInt()),
+                        const Color(0xFF81DC6E).withAlpha((0.1 * 255).toInt()),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -349,7 +346,7 @@ class _QuestionScreenState extends State<QuestionScreen>
         gradient: LinearGradient(
           colors: [
             Colors.white,
-            const Color(0xFF69D1E9).withOpacity(0.05),
+            const Color(0xFF69D1E9).withAlpha((0.05 * 255).toInt()),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -357,7 +354,7 @@ class _QuestionScreenState extends State<QuestionScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withAlpha((0.1 * 255).toInt()),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -382,7 +379,7 @@ class _QuestionScreenState extends State<QuestionScreen>
     final showResult = selectedAnswer != null;
     
     Color backgroundColor = Colors.white;
-    Color borderColor = const Color(0xFF69D1E9).withOpacity(0.3);
+    Color borderColor = const Color(0xFF69D1E9).withAlpha((0.3 * 255).toInt());
     Color textColor = Colors.black87;
     Color letterColor = const Color(0xFF69D1E9);
 
@@ -404,7 +401,7 @@ class _QuestionScreenState extends State<QuestionScreen>
       child: Material(
         borderRadius: BorderRadius.circular(15),
         elevation: isSelected ? 8 : 2,
-        shadowColor: isSelected ? letterColor.withOpacity(0.3) : Colors.black.withOpacity(0.1),
+        shadowColor: isSelected ? letterColor.withAlpha((0.3 * 255).toInt()) : Colors.black.withAlpha((0.1 * 255).toInt()),
         child: InkWell(
           borderRadius: BorderRadius.circular(15),
           onTap: selectedAnswer == null ? () => _handleAnswer(answerIndex) : null,
@@ -528,22 +525,31 @@ class _QuestionScreenState extends State<QuestionScreen>
               
               // Pergunta
               if (!isLoading) _buildQuestionCard(),
-              
               const SizedBox(height: 20),
-              
               // Opções de resposta
               if (!isLoading)
                 Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        _buildAnswerOption(currentQuestion!.opcaoA, 1, 'A'),
-                        _buildAnswerOption(currentQuestion!.opcaoB, 2, 'B'),
-                        _buildAnswerOption(currentQuestion!.opcaoC, 3, 'C'),
-                        _buildAnswerOption(currentQuestion!.opcaoD, 4, 'D'),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    itemCount: currentQuestion!.opcoes.length,
+                    itemBuilder: (context, index) {
+                      // Suporta tanto lista de string quanto lista de mapas {"a": "texto"}
+                      final op = currentQuestion!.opcoes[index];
+                      String texto;
+                      String letra;
+                      if (op is Map && op.isNotEmpty) {
+                        letra = op.keys.first.toUpperCase();
+                        texto = op.values.first.toString();
+                      } else {
+                        letra = String.fromCharCode(65 + index); // A, B, C, D
+                        texto = op.toString();
+                      }
+                      return _buildAnswerOption(
+                        texto,
+                        index + 1,
+                        letra,
+                      );
+                    },
                   ),
                 ),
               

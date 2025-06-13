@@ -40,21 +40,6 @@ class LoginDatabase {
           )
         ''');
       },
-      onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < 2) {
-          await db.execute('''
-            CREATE TABLE questions(
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              enunciado TEXT NOT NULL,
-              opcao_a TEXT NOT NULL,
-              opcao_b TEXT NOT NULL,
-              opcao_c TEXT NOT NULL,
-              opcao_d TEXT NOT NULL,
-              resposta_correta INTEGER NOT NULL
-            )
-          ''');
-        }
-      },
     );
   }
 }

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:parasitados/screen/questions/add_questions.dart';
+import 'package:parasitados/screen/questions/home.dart';
+import 'package:parasitados/routes/routes.dart';
+import 'package:parasitados/screen/questions/questions_disponivel.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:io';
-import 'login_page.dart';
+import 'screen/login/login_page.dart';
 
 Future<void> main() async {
   // Garante que o Flutter está inicializado
@@ -22,10 +26,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginPage(),
+	  initialRoute: Routes.home,
+	  routes: {
+		Routes.home:(context) => LoginPage() ,
+		Routes.questoesDisponiveis: (context) => QuestionsDisponivel(),
+		Routes.questionScreen: (context) => HomePage(),
+		Routes.addQuestion: (context) => AddQuestionsScreen(),
+	  },
     );
   }
-  }
-
+}

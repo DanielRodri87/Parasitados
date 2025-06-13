@@ -38,6 +38,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  redis: ^4.0.0
 
 dev_dependencies:
   flutter_test:
@@ -56,25 +57,8 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - assets/images/add_foto.png
-    - assets/images/gato_login.png
-    - assets/images/LogoApp.png
-    - assets/images/user.png
-    - assets/images/back_login.png
-    - assets/images/fite.png
-    - assets/images/pulgo.png
-    - assets/images/carraputo.png
-    - assets/images/logo_ladopar.png
-    - assets/images/azul_cinza.png
-    - assets/images/barata_cinza.png
-    - assets/images/minhoca_cinza.png
-    - assets/images/azul.png
-    - assets/images/barata.png
-    - assets/images/minhoca.png
-    - assets/images/carregando.png
-    - assets/images/roleta.png
-    - assets/images/gatopreto.png
-    - assets/images/vs.png
+    - assets/images/
+    - assets/pdf/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

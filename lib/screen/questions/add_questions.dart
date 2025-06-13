@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'database.dart';
+import 'package:parasitados/class/questions/questions.dart';
+import '../../database/database.dart';
 
-class QuestionScreen extends StatefulWidget {
-  const QuestionScreen({super.key});
+class AddQuestionsScreen extends StatefulWidget {
+  const AddQuestionsScreen({super.key});
 
   @override
-  State<QuestionScreen> createState() => _QuestionScreenState();
+  State<AddQuestionsScreen> createState() => _AddQuestionsScreenState();
 }
 
-class _QuestionScreenState extends State<QuestionScreen> {
+class _AddQuestionsScreenState extends State<AddQuestionsScreen> {
   int? selectedOption;
 
   final TextEditingController enunciadoController = TextEditingController();
@@ -39,22 +40,30 @@ class _QuestionScreenState extends State<QuestionScreen> {
         return;
       }
 
-      final db = await dbHelper.database;
-      
-      await db.insert('questions', {
-        'enunciado': enunciado,
-        'opcao_a': opcaoA,
-        'opcao_b': opcaoB,
-        'opcao_c': opcaoC,
-        'opcao_d': opcaoD,
-        'resposta_correta': selectedOption,
-      });
-
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Questão cadastrada com sucesso')),
+      // Carrega as questões existentes do JSON
+      final jsonPath = 'assets/pdf/questions.json';
+      final questions = await Questions.fromJsonFile(jsonPath);
+      // Gera novo id
+      // Cria a nova questão
+      // Adiciona ao JSON
+      await questions.addQuestion(
+        jsonPath,
+        {
+          'pergunta': enunciado,
+          'resposta': String.fromCharCode(96 + selectedOption!), // 1->a, 2->b, etc
+          'alternativas': [
+            {"a": opcaoA},
+            {"b": opcaoB},
+            {"c": opcaoC},
+            {"d": opcaoD},
+          ]
+        },
       );
-
+		if(mounted){
+			ScaffoldMessenger.of(context).showSnackBar(
+				const SnackBar(content: Text('Questão cadastrada com sucesso no JSON')),
+			);
+		}
       // Limpar campos
       enunciadoController.clear();
       opcaoAController.clear();
@@ -66,10 +75,11 @@ class _QuestionScreenState extends State<QuestionScreen> {
       });
 
     } catch (e) {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao cadastrar questão: $e')),
-      );
+		if(mounted){
+			ScaffoldMessenger.of(context).showSnackBar(
+				SnackBar(content: Text('Erro ao cadastrar questão: $e')),
+			);
+		}
     }
   }
 
