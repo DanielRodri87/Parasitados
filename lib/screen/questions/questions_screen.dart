@@ -123,85 +123,86 @@ class _QuestionScreenState extends State<QuestionScreen>
       context: context,
       barrierDismissible: false, // Previne fechar ao clicar fora
       builder: (BuildContext context) {
-		return PopScope( // Previne o botão de voltar
-		  canPop: false,
-		  child: ScaleTransition(
-			scale: _scaleAnimation,
-			child: AlertDialog(
-			  backgroundColor: Colors.transparent,
-			  elevation: 0,
-			  content: Container(
-			padding: const EdgeInsets.all(24),
-			decoration: BoxDecoration(
-			  gradient: LinearGradient(
-				colors: isAnswerCorrect!
-				? [Colors.green.shade300, Colors.green.shade500]
-				: [Colors.red.shade300, Colors.red.shade500],
-				begin: Alignment.topLeft,
-				end: Alignment.bottomRight,
-			  ),
-			  borderRadius: BorderRadius.circular(20),
-			  boxShadow: [
-				BoxShadow(
-				  color: Colors.black.withAlpha((0.2 * 255).toInt()),
-				  blurRadius: 20,
-				  offset: const Offset(0, 10),
-				),
-			  ],
-			),
-			child: Column(
-			  mainAxisSize: MainAxisSize.min,
-			  children: [
-				Icon(
-				  isAnswerCorrect! ? Icons.check_circle : Icons.cancel,
-				  size: 80,
-				  color: Colors.white,
-				),
-				const SizedBox(height: 16),
-				Text(
-				  isAnswerCorrect! ? 'Parabéns!' : 'Ops!',
-				  style: const TextStyle(
-				fontSize: 28,
-				fontWeight: FontWeight.bold,
-				color: Colors.white,
-				  ),
-				),
-				const SizedBox(height: 8),
-				Text(
-				  isAnswerCorrect! 
-				  ? 'Resposta correta! 🎉'
-				  : 'Resposta incorreta! 😢',
-				  style: const TextStyle(
-				fontSize: 18,
-				color: Colors.white,
-				  ),
-				  textAlign: TextAlign.center,
-				),
-				const SizedBox(height: 24),
-				ElevatedButton(
-				  onPressed: () => Navigator.of(context).pop(true),
-				  style: ElevatedButton.styleFrom(
-				backgroundColor: Colors.white,
-				foregroundColor: isAnswerCorrect! ? Colors.green : Colors.red,
-				padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-				shape: RoundedRectangleBorder(
-				  borderRadius: BorderRadius.circular(25),
-				),
-				  ),
-				  child: const Text(
-				'Continuar',
-			 style: TextStyle(
-				  fontSize: 16,
-				  fontWeight: FontWeight.bold,
-				),
-				  ),
-				),
-			  ],
-			),
-			  ),
-			),
-		  ),
-		);
+        return PopScope( // Previne o botão de voltar
+          canPop: false,
+          child: ScaleTransition(
+            scale: _scaleAnimation,
+            child: AlertDialog(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              // Remove the default close button by not setting actions
+              content: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: isAnswerCorrect!
+                    ? [Colors.green.shade300, Colors.green.shade500]
+                    : [Colors.red.shade300, Colors.red.shade500],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha((0.2 * 255).toInt()),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isAnswerCorrect! ? Icons.check_circle : Icons.cancel,
+                      size: 80,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      isAnswerCorrect! ? 'Parabéns!' : 'Ops!',
+                      style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      isAnswerCorrect! 
+                      ? 'Resposta correta! 🎉'
+                      : 'Resposta incorreta! 😢',
+                      style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: isAnswerCorrect! ? Colors.green : Colors.red,
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                      ),
+                      child: const Text(
+                    'Continuar',
+                 style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
       },
     ) ?? false;
   }
@@ -496,102 +497,90 @@ class _QuestionScreenState extends State<QuestionScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFFF8FDFF),
-              Color(0xFFF0F9FF),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFFF8FDFF),
+                Color(0xFFF0F9FF),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Header com botão voltar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(
-                        Icons.arrow_back_ios,
-                        color: Color(0xFF69D1E9),
-                        size: 24,
-                      ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                // Header sem botão voltar
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Text(
+                    'Pergunta',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF69D1E9),
                     ),
-                    const Expanded(
-                      child: Text(
-                        'Pergunta',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF69D1E9),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const SizedBox(width: 48), // Para centralizar o título
-                  ],
-                ),
-              ),
-              
-              // Header do jogador atual
-              _buildCurrentPlayerHeader(),
-              
-              const SizedBox(height: 20),
-              
-              // Seção do animal
-              _buildAnimalSection(),
-              
-              const SizedBox(height: 20),
-              
-              // Conteúdo principal em um layout flexível
-              if (!isLoading) Expanded(
-                child: Column(
-                  children: [
-                    _buildQuestionCard(),
-                    const SizedBox(height: 8), // Reduzido de 20 para 8
-                    // Área de respostas com scroll
-                    Expanded(
-                      flex: 4, // Aumentado de 3 para 4 para dar mais espaço às alternativas
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: currentQuestion!.opcoes.length,
-                        itemBuilder: (context, index) {
-                          final op = currentQuestion!.opcoes[index];
-                          String texto;
-                          String letra;
-                          if (op is Map && op.isNotEmpty) {
-                            letra = op.keys.first.toUpperCase();
-                            texto = op.values.first.toString();
-                          } else {
-                            letra = String.fromCharCode(65 + index);
-                            texto = op.toString();
-                          }
-                          return _buildAnswerOption(texto, index + 1, letra);
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 8), // Reduzido de 16 para 8
-                  ],
-                ),
-              ),
-              
-              // Loading indicator
-              if (isLoading)
-                const Expanded(
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF69D1E9)),
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-            ],
+                
+                // Header do jogador atual
+                _buildCurrentPlayerHeader(),
+                
+                const SizedBox(height: 20),
+                
+                // Seção do animal
+                _buildAnimalSection(),
+                
+                const SizedBox(height: 20),
+                
+                // Conteúdo principal em um layout flexível
+                if (!isLoading) Expanded(
+                  child: Column(
+                    children: [
+                      _buildQuestionCard(),
+                      const SizedBox(height: 8), // Reduzido de 20 para 8
+                      // Área de respostas com scroll
+                      Expanded(
+                        flex: 4, // Aumentado de 3 para 4 para dar mais espaço às alternativas
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: currentQuestion!.opcoes.length,
+                          itemBuilder: (context, index) {
+                            final op = currentQuestion!.opcoes[index];
+                            String texto;
+                            String letra;
+                            if (op is Map && op.isNotEmpty) {
+                              letra = op.keys.first.toUpperCase();
+                              texto = op.values.first.toString();
+                            } else {
+                              letra = String.fromCharCode(65 + index);
+                              texto = op.toString();
+                            }
+                            return _buildAnswerOption(texto, index + 1, letra);
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 8), // Reduzido de 16 para 8
+                    ],
+                  ),
+                ),
+                
+                // Loading indicator
+                if (isLoading)
+                  const Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF69D1E9)),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

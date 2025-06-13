@@ -5,8 +5,7 @@ import 'package:parasitados/routes/routes.dart';
 import 'package:sqflite/sqflite.dart';
 import '../questions/loading_game.dart';
 import '../../database/database.dart';
-import '../about/about.dart'; // Adicione esta importação
-
+import '../about/about.dart'; 
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});

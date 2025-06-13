@@ -6,6 +6,14 @@ class LadoparScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF010D47),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        elevation: 0,
+      ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
@@ -121,7 +129,7 @@ class LadoparScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Image.asset(
-                    'assets/images/logo.png', // Substituir pelo logo correto
+                    'assets/images/LogoApp.png', // Alterado de logo.png para LogoApp.png
                     height: 80,
                   ),
                   const SizedBox(height: 15),

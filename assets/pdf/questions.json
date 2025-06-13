@@ -4018,5 +4018,25 @@
         }
       ]
     }
+  },
+  {
+    "202": {
+      "pergunta": "Qual o hospedeiro intermediário do Metastrongylus spp.?",
+      "resposta": "c",
+      "alternativas": [
+        {
+          "a": "caramujos"
+        },
+        {
+          "b": "besouros"
+        },
+        {
+          "c": "minhocas"
+        },
+        {
+          "d": "moscas"
+        }
+      ]
+    }
   }
 ]
