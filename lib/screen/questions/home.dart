@@ -51,9 +51,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // Map for animal names in Portuguese
   final Map<String, String> animalNames = {
-    'barata': 'Barata',
-    'minhoca': 'Minhoca',
-    'azul': 'Azul',
+    'barata': 'Ectoparasitas',
+    'minhoca': 'Helmintos',
+    'azul': 'Protozoários',
   };
 
   @override

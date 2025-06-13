@@ -273,12 +273,19 @@ class _QuestionScreenState extends State<QuestionScreen>
   }
 
   Widget _buildAnimalSection() {
+    // Map of technical names
+    final Map<String, String> technicalNames = {
+      'barata': 'Ectoparasitas',
+      'minhoca': 'Helmintos',
+      'azul': 'Protozoários',
+    };
+
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // reduced margin
-      padding: const EdgeInsets.all(12), // reduced padding
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15), // smaller radius
+        borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha((0.1 * 255).toInt()),
@@ -287,12 +294,12 @@ class _QuestionScreenState extends State<QuestionScreen>
           ),
         ],
       ),
-      child: Row( // changed to Row layout
+      child: Row(
         children: [
           const Text(
             'Pergunta sobre:',
             style: TextStyle(
-              fontSize: 14, // smaller font
+              fontSize: 14,
               color: Colors.grey,
               fontWeight: FontWeight.w500,
             ),
@@ -304,7 +311,7 @@ class _QuestionScreenState extends State<QuestionScreen>
               return Transform.scale(
                 scale: _pulseAnimation.value,
                 child: Container(
-                  padding: const EdgeInsets.all(8), // reduced padding
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
@@ -318,8 +325,8 @@ class _QuestionScreenState extends State<QuestionScreen>
                   ),
                   child: Image.asset(
                     'assets/images/${widget.animal}.png',
-                    height: 40, // smaller size
-                    width: 40, // smaller size
+                    height: 40,
+                    width: 40,
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -328,9 +335,9 @@ class _QuestionScreenState extends State<QuestionScreen>
           ),
           const SizedBox(width: 12),
           Text(
-            widget.animal,
+            technicalNames[widget.animal] ?? widget.animal,
             style: const TextStyle(
-              fontSize: 16, // smaller font
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Color(0xFF69D1E9),
             ),
