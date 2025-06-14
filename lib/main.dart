@@ -43,30 +43,27 @@ class MyApp extends StatelessWidget {
 	@override
 	Widget build(BuildContext context) {
 		return MaterialApp(
-		debugShowCheckedModeBanner: false,
-		initialRoute: Routes.home,
-		routes: {
-			Routes.home:(context) => LoginPage() ,
-			Routes.questoesDisponiveis: (context) => QuestionsDisponivel(),
-			Routes.questionScreen: (context) => HomePage(),
-			Routes.addQuestion: (context) => AddQuestionsScreen(),
-			Routes.aboutScreen: (context) => AboutPage(),
-			Routes.loadingScreen: (context) => LoadingGamePage(),
-		},
-		builder: (context, child) {
-			
-			Future.microtask(() async {
-				await Provider.of<QuestionDatabaseProvider>(context, listen: false).connect();
-			});
-
-			// Sincroniza dados apenas uma vez, após o primeiro frame
-			Future.microtask(() async {
-				await Provider.of<QuestionsProvider>(context, listen: false).syncAllQuestionsDatabaseToLocal(context);
-			});
-
-
-			return child!;
-		},
+			debugShowCheckedModeBanner: false,
+			initialRoute: Routes.home,
+			routes: {
+				Routes.home:(context) => LoginPage() ,
+				Routes.questoesDisponiveis: (context) => QuestionsDisponivel(),
+				Routes.questionScreen: (context) => HomePage(),
+				Routes.addQuestion: (context) => AddQuestionsScreen(),
+				Routes.aboutScreen: (context) => AboutPage(),
+				Routes.loadingScreen: (context) => LoadingGamePage(),
+			},
+			builder: (context, child) {
+				Future.microtask(() async {
+					if (context.mounted) {
+						await Provider.of<QuestionDatabaseProvider>(context, listen: false).connect();
+						if (context.mounted) {
+							await Provider.of<QuestionsProvider>(context, listen: false).syncAllQuestionsDatabaseToLocal(context);
+						}
+					}
+				});
+				return child!;
+			},
 		);
 	}
 }

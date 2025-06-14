@@ -18,14 +18,30 @@ void testeInserirDadosRedis(){
 		String jsonPath = 'assets/pdf/questions.json';
 		final QuestionDatabase db = QuestionDatabase();
 		Questions questions = Questions();
-		questions = await Questions.fromJsonFile(jsonPath);
+		questions = await Questions.fromJsonFile();
 		
-		// Conectar ao Redis
-		bool retorno = await db.connectRedis();
-		db.loadQuestionsToRedis(jsonPath);
+		await db.connectRedis();
+		await db.loadQuestionsToRedis(jsonPath);
+
 		Map<String, dynamic>? questao = await db.getQuestion(1);
-		expect(retorno, true);
 		expect(questions.getQuestion(1)!.enunciado, questao!['pergunta']);
+	});
+}
+
+void testeQuantidadeQuestoesRedis() {
+	test("Testando se a quantidade de questões no Redis é igual ao JSON", () async {
+		final db = QuestionDatabase();
+		await db.connectRedis();
+
+		// Carrega questões do JSON
+		final questions = await Questions.fromJsonFile();
+		final int quantJson = questions.getQuantQuestion();
+
+		// Carrega questões do Redis
+		final allQuestionsRedis = await db.getAllQuestions();
+		final int quantRedis = allQuestionsRedis.length;
+
+		expect(quantRedis, quantJson);
 	});
 }
 
@@ -39,12 +55,12 @@ void testeLerDadosRedis(){
 	});
 }
 
-void testeAddOrUpdateQuestion() {
-	test('Testa addOrUpdateQuestion insere e recupera corretamente', () async {
+void testeUpdateQuestion() {
+	test('Testa updateQuestion atualiza a pergunta corretamente', () async {
 		final db = QuestionDatabase();
 		await db.connectRedis();
 
-		final int id = 9999;
+		final int id = 1;
 		final Map<String, dynamic> question = {
 			'pergunta': 'Pergunta de teste',
 			'resposta': 'a',
@@ -56,7 +72,7 @@ void testeAddOrUpdateQuestion() {
 			]
 		};
 
-		await db.addOrUpdateQuestion(id, question);
+		await db.updateQuestion(id, question);
 		final result = await db.getQuestion(id);
 
 		expect(result, isNotNull);
@@ -65,10 +81,36 @@ void testeAddOrUpdateQuestion() {
 	});
 }
 
+void testeAddQuestion() {
+	test('Testa addQuestion insere e recupera corretamente', () async {
+		final db = QuestionDatabase();
+		await db.connectRedis();
+
+		final Map<String, dynamic> question = {
+			'pergunta': 'Pergunta de teste',
+			'resposta': 'a',
+			'alternativas': [
+				{'a': 'Alternativa A'},
+				{'b': 'Alternativa B'},
+				{'c': 'Alternativa C'},
+				{'d': 'Alternativa D'},
+			]
+		};
+		Questions questions = await db.databaseToLocal();
+		await db.addQuestion(questions, question);
+		final result = await db.getQuestion(questions.getQuantQuestion());
+
+		expect(result!['pergunta'], 'Pergunta de teste');
+		db.delQuestion(questions.getQuantQuestion());
+	});
+}
+
 void main() async {
 	await dotenv.load(fileName: ".env");
 	testeConexaoRedis();
-	// testeInserirDadosRedis();
+	testeInserirDadosRedis();
 	testeLerDadosRedis();
-	testeAddOrUpdateQuestion();
+	testeQuantidadeQuestoesRedis();
+	testeUpdateQuestion();
+	testeAddQuestion();
 }

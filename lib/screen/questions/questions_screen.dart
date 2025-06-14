@@ -1,8 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:parasitados/class/questions/question.dart';
 import 'dart:io';
-import 'package:parasitados/class/questions/questions.dart';
-import '../../class/questions/question.dart';
+import 'package:parasitados/provider/questions_provider.dart';
+import 'package:provider/provider.dart';
 
 class QuestionScreen extends StatefulWidget {
   final String animal;
@@ -82,19 +83,19 @@ class _QuestionScreenState extends State<QuestionScreen>
     super.dispose();
   }
 
-  Future<void> _loadRandomQuestion() async {
+  void _loadRandomQuestion()  {
     // Carrega todas as questões do JSON
-    final questions = await Questions.fromJsonFile('assets/pdf/questions.json');
+    final questions = Provider.of<QuestionsProvider>(context,listen: false).questions;
+
     final questoesList = questions.questoes.values.toList();
     if (questoesList.isNotEmpty) {
-      final random = Random();
+      	final random = Random();
 		final q = questoesList[random.nextInt(questoesList.length)];
 
-    //   final q = questoesList[Questions.id];
-      setState(() {
-        currentQuestion = q;
-        isLoading = false;
-      });
+		setState(() {
+			currentQuestion = q;
+			isLoading = false;
+		});
     }
   }
 

@@ -8,7 +8,7 @@ import 'dart:convert';
 import 'dart:io';
 
 class QuestionDatabase {
-	bool useUpstash = false; // Altere para false para usar Redis local
+	bool useUpstash = false; 
 	upstash.Redis? _upstashRedis;
 	localredis.Command? _localRedis;
 
@@ -38,7 +38,6 @@ class QuestionDatabase {
 		return retorno;
 	}
 
-	// Exemplo de uso para HSET
 	Future<void> hset(String key, Map<String, dynamic> value) async {
 		if (useUpstash) {
 		await _upstashRedis!.hset('questions', value);
@@ -47,20 +46,19 @@ class QuestionDatabase {
 		}
 	}
 
-	// Exemplo de uso para HGETALL
 	Future<Map<dynamic, dynamic>?> hgetall(String key) async {
 		if (useUpstash) {
-		return await _upstashRedis!.hgetall(key);
+			return await _upstashRedis!.hgetall(key);
 		} else {
-		final result = await _localRedis!.send_object(['HGETALL', key]);
-		if (result is List) {
-			final map = <dynamic, dynamic>{};
-			for (int i = 0; i < result.length; i += 2) {
-			map[result[i]] = result[i + 1];
+			final result = await _localRedis!.send_object(['HGETALL', key]);
+			if (result is List) {
+				final map = <dynamic, dynamic>{};
+				for (int i = 0; i < result.length; i += 2) {
+					map[result[i]] = result[i + 1];
+				}
+				return map;
 			}
-			return map;
-		}
-		return null;
+			return null;
 		}
 	}
 
@@ -69,16 +67,44 @@ class QuestionDatabase {
 		final file = File(jsonPath);
 		final jsonString = await file.readAsString();
 		final List<dynamic> data = json.decode(jsonString);
+
 		for (var q in data) {
-		q.forEach((key, value) async {
-			await hset('questions', {key: json.encode(value)});
-		});
+			for (var key in q.keys) {
+				await hset('questions', {key: json.encode(q[key])});
+			}
 		}
 	}
 
 	// Adiciona/atualiza uma questão no Redis
-	Future<void> addOrUpdateQuestion(int id, Map<String, dynamic> question) async {
+	Future<void> updateQuestion(int id, Map<String, dynamic> question) async {
 		await hset('questions', {id.toString(): json.encode(question)});
+	}
+
+	// Adiciona/atualiza uma questão no Redis, usando o próximo id do cache se não for informado
+	Future<int> addQuestion(Questions questions, Map<String, dynamic> question) async {
+		final questionId = await getNextQuestionIdFromCache(questions);
+
+		await hset('questions', {questionId.toString(): json.encode(question)});
+
+		return questionId;
+	}
+
+	// Remove uma questão do Redis pelo id
+	Future<bool> delQuestion(int id) async {
+		bool retorno = true;
+
+		try {
+			if (useUpstash) {
+				await _upstashRedis!.hdel('questions', id.toString());
+			} else {
+				await _localRedis!.send_object(['HDEL', 'questions', id.toString()]);
+			}
+		} catch (e) {
+			debugPrint('Erro ao remover questão: $e');
+			retorno = false;
+		}
+
+		return retorno;
 	}
 
 	// Busca todas as questões do Redis
@@ -111,10 +137,19 @@ class QuestionDatabase {
 		late Questions questions = Questions();
 
 		questions.questoes = Map.fromEntries(
-		questoes.entries.map((entry) => MapEntry(entry.key, Question.fromJson(entry.key, entry.value)))
+			questoes.entries.map((entry) => MapEntry(entry.key, Question.fromJson(entry.key, entry.value)))
 		);
 
 		return questions;
 	}
   
+	// Obtém o próximo id disponível usando a instância Questions (cache local)
+	Future<int> getNextQuestionIdFromCache(Questions questions) async {
+		if (questions.questoes.isEmpty) {
+			// Se não houver questões, começa do 1
+			return 1;
+		}
+		final lastId = questions.questoes.keys.reduce((a, b) => a > b ? a : b);
+		return lastId + 1;
+	}
 }

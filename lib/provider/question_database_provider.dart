@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:parasitados/class/questions/questions.dart';
 import 'package:parasitados/database/question_database.dart';
+import 'package:parasitados/provider/questions_provider.dart';
+import 'package:provider/provider.dart';
 
 class QuestionDatabaseProvider extends ChangeNotifier {
 	final QuestionDatabase _db = QuestionDatabase();
@@ -10,17 +12,13 @@ class QuestionDatabaseProvider extends ChangeNotifier {
 
 	QuestionDatabase get db => _db;
 
-	Future<void> _initOnce() async {
+	Future<void> connect() async {
 		if (!_isConnected && !_isConnecting) {
 			_isConnecting = true;
 			_isConnected = await _db.connectRedis();
 			_isConnecting = false;
 			notifyListeners();
 		}
-	}
-
-	Future<void> connect() async {
-		await _initOnce();
 	}
 
 	Future<void> reloadQuestionsFromJson(String jsonPath) async {
@@ -36,10 +34,20 @@ class QuestionDatabaseProvider extends ChangeNotifier {
 		return await _db.getQuestion(id);
 	}
 
-	Future<int> addOrUpdateQuestion(int id, Map<String, dynamic> question) async {
+	Future<int> updateQuestion(int id, Map<String, dynamic> question) async {
 		int retorno = -1;
-		await _db.addOrUpdateQuestion(id, question);
+		await _db.updateQuestion(id, question);
 		retorno = id;
+		notifyListeners();
+		return retorno;
+	}
+
+	Future<int> addQuestion(Map<String, dynamic> question, BuildContext context) async {
+		int retorno = -1;
+		Questions questions = Provider.of<QuestionsProvider>(context,listen:false).questions;
+		
+		retorno = await _db.addQuestion(questions, question);
+		
 		notifyListeners();
 		return retorno;
 	}

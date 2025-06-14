@@ -42,10 +42,7 @@ class _AddQuestionsScreenState extends State<AddQuestionsScreen> {
 			);
 			return;
 		}
-
-		int retorno = await Provider.of<QuestionDatabaseProvider>(context,listen: false).addOrUpdateQuestion(
-			Provider.of<QuestionsProvider>(context,listen: false).questions.id + 1,
-			{
+		Map<String,dynamic> dados = {
 			'pergunta': enunciado,
 			'resposta': String.fromCharCode(96 + selectedOption!), // 1->a, 2->b, etc
 			'alternativas': [
@@ -54,9 +51,14 @@ class _AddQuestionsScreenState extends State<AddQuestionsScreen> {
 				{"c": opcaoC},
 				{"d": opcaoD},
 			]
-			},
+		};
+		int retorno = await Provider.of<QuestionDatabaseProvider>(context,listen: false).addQuestion(
+			dados,
+			context
 		);
 		
+		if(mounted) await Provider.of<QuestionsProvider>(context,listen:false).addQuestion(dados);
+
 		if(mounted){
 			ScaffoldMessenger.of(context).showSnackBar(
 				SnackBar(content: Text('Questão cadastrada com sucesso no Banco de Dados $retorno')),

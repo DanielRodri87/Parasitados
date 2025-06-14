@@ -1,24 +1,23 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:parasitados/class/questions/question.dart';
 
 class Questions {
 	int id = 0;
 	Map<int,Question> questoes = {};
-
-	Questions();
+	static String jsonPath = 'assets/pdf/questions.json';
+	int get quantQuestion => questoes.length;
 
 	// Use a factory constructor to handle async initialization
-	static Future<Questions> fromJsonFile(String jsonPath) async {
+	static Future<Questions> fromJsonFile() async {
 		final data = await getAllQuestionsJson(jsonPath);
 		final questions = Questions();
 		questions.questoes = {
 			for (var q in data)
 				int.parse(q.keys.first): Question.fromJson(
-					int.parse(q.keys.first),
-					q[q.keys.first] as Map<String, dynamic>
-				)
+				int.parse(q.keys.first),
+				q[q.keys.first] as Map<String, dynamic>
+			)
 		};
 		// Atualiza o último id
 		if (questions.questoes.isNotEmpty) {
@@ -27,35 +26,33 @@ class Questions {
 			questions.id = 0;
 		}
 		return questions;
-	}
+  	}
 
-	int getQuantQuestion(){
-		id = questoes.keys.reduce((a, b) => a > b ? a : b);
-		return id;
-	}
+	Future<void> addQuestion(Map<String, dynamic> questionData) async {
+    final file = File(jsonPath);
+    final jsonString = await file.readAsString();
+    final List<dynamic> data = json.decode(jsonString);
 
-	// Renomeia o método estático para evitar conflito
-	Future<void> addQuestion(String jsonPath, Map<String, dynamic> questionData) async {
-		final file = File(jsonPath);
-		final jsonString = await file.readAsString();
-		final List<dynamic> data = json.decode(jsonString);
-		id++;
+    // Gera novo id único
+    int newId = 1;
+    final existingIds = <int>{};
+    for (var q in data) {
+      final idStr = q.keys.first;
+      final idInt = int.tryParse(idStr);
+      if (idInt != null) existingIds.add(idInt);
+    }
+    while (existingIds.contains(newId)) {
+      newId++;
+    }
 
-		// Gera o novo id
-		final newId = id.toString();
+    // Adiciona a nova questão mantendo o formato original
+    data.add({newId.toString(): questionData});
 
-		// Adiciona a nova questão mantendo o formato original
-		data.add({newId: questionData});
-
-		// Salva de volta mantendo o formato (lista de mapas)
-		final encoder = JsonEncoder.withIndent('  ');
-		await file.writeAsString(encoder.convert(data), flush: true);
-
-		// Incrementa o id apenas após salvar com sucesso
-
-		// Adiciona também na própria instância da classe
-		questoes[int.parse(newId)] = Question.fromJson(int.parse(newId), questionData);
-	}
+    final encoder = JsonEncoder.withIndent('  ');
+    await file.writeAsString(encoder.convert(data), flush: true);
+    questoes[newId] = Question.fromJson(newId, questionData);
+    id = newId;
+  }
 
 	static Future<List<dynamic>> getAllQuestionsJson(String jsonPath) async {
 		final file = File(jsonPath);
@@ -68,7 +65,7 @@ class Questions {
 		return questoes[id];
 	}
 
-	Future<void> saveAllToJson(String jsonPath) async {
+	Future<void> saveAllToJson() async {
 		// Converte todas as questões para o formato [{"id": {...}}, ...]
 		final List<Map<String, dynamic>> data = questoes.entries.map((entry) => {
 			entry.key.toString(): entry.value.toJson()
@@ -77,4 +74,5 @@ class Questions {
 		final file = File(jsonPath);
 		await file.writeAsString(encoder.convert(data), flush: true);
 	}
+
 }
