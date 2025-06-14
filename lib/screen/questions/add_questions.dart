@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:parasitados/class/questions/questions.dart';
+import 'package:parasitados/partials/add_questions/option_tile.dart';
+import 'package:parasitados/provider/question_database_provider.dart';
+import 'package:provider/provider.dart';
 import '../../database/database.dart';
 
 class AddQuestionsScreen extends StatefulWidget {
@@ -20,68 +23,67 @@ class _AddQuestionsScreenState extends State<AddQuestionsScreen> {
 
   final LoginDatabase dbHelper = LoginDatabase();
 
-  Future<void> _cadastrarQuestao() async {
-    try {
-      final enunciado = enunciadoController.text.trim();
-      final opcaoA = opcaoAController.text.trim();
-      final opcaoB = opcaoBController.text.trim();
-      final opcaoC = opcaoCController.text.trim();
-      final opcaoD = opcaoDController.text.trim();
+	Future<void> _cadastrarQuestao() async {
+		try {
+		final enunciado = enunciadoController.text.trim();
+		final opcaoA = opcaoAController.text.trim();
+		final opcaoB = opcaoBController.text.trim();
+		final opcaoC = opcaoCController.text.trim();
+		final opcaoD = opcaoDController.text.trim();
 
-      if (enunciado.isEmpty ||
-          opcaoA.isEmpty ||
-          opcaoB.isEmpty ||
-          opcaoC.isEmpty ||
-          opcaoD.isEmpty ||
-          selectedOption == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Preencha todos os campos e selecione a correta')),
-        );
-        return;
-      }
+		if (enunciado.isEmpty ||
+			opcaoA.isEmpty ||
+			opcaoB.isEmpty ||
+			opcaoC.isEmpty ||
+			opcaoD.isEmpty ||
+			selectedOption == null) {
+			ScaffoldMessenger.of(context).showSnackBar(
+			const SnackBar(content: Text('Preencha todos os campos e selecione a correta')),
+			);
+			return;
+		}
 
-      // Carrega as questões existentes do JSON
-      final jsonPath = 'assets/pdf/questions.json';
-      final questions = await Questions.fromJsonFile(jsonPath);
-      // Gera novo id
-      // Cria a nova questão
-      // Adiciona ao JSON
-      await questions.addQuestion(
-        jsonPath,
-        {
-          'pergunta': enunciado,
-          'resposta': String.fromCharCode(96 + selectedOption!), // 1->a, 2->b, etc
-          'alternativas': [
-            {"a": opcaoA},
-            {"b": opcaoB},
-            {"c": opcaoC},
-            {"d": opcaoD},
-          ]
-        },
-      );
+		// // Carrega as questões existentes do JSON
+		// final jsonPath = 'assets/pdf/questions.json';
+		
+
+		await Provider.of<QuestionDatabaseProvider>(context,listen: false).addOrUpdateQuestion(
+			Questions.id + 1,
+			{
+			'pergunta': enunciado,
+			'resposta': String.fromCharCode(96 + selectedOption!), // 1->a, 2->b, etc
+			'alternativas': [
+				{"a": opcaoA},
+				{"b": opcaoB},
+				{"c": opcaoC},
+				{"d": opcaoD},
+			]
+			},
+		);
+		
 		if(mounted){
 			ScaffoldMessenger.of(context).showSnackBar(
 				const SnackBar(content: Text('Questão cadastrada com sucesso no JSON')),
 			);
 		}
-      // Limpar campos
-      enunciadoController.clear();
-      opcaoAController.clear();
-      opcaoBController.clear();
-      opcaoCController.clear();
-      opcaoDController.clear();
-      setState(() {
-        selectedOption = null;
-      });
 
-    } catch (e) {
-		if(mounted){
-			ScaffoldMessenger.of(context).showSnackBar(
-				SnackBar(content: Text('Erro ao cadastrar questão: $e')),
-			);
+		enunciadoController.clear();
+		opcaoAController.clear();
+		opcaoBController.clear();
+		opcaoCController.clear();
+		opcaoDController.clear();
+		setState(() {
+			selectedOption = null;
+		});
+
+		} catch (e) {
+			if(mounted){
+				ScaffoldMessenger.of(context).showSnackBar(
+					SnackBar(content: Text('Erro ao cadastrar questão: $e')),
+				);
+			}
 		}
-    }
-  }
+	}
 
   @override
   Widget build(BuildContext context) {
@@ -222,79 +224,3 @@ class _AddQuestionsScreenState extends State<AddQuestionsScreen> {
   }
 }
 
-// 🔥 Widget das opções com TextField + RadioButton
-class OptionTile extends StatelessWidget {
-  final TextEditingController controller;
-  final String optionLetter;
-  final String hint;
-  final int value;
-  final int? groupValue;
-  final ValueChanged<int?> onChanged;
-
-  const OptionTile({
-    super.key,
-    required this.controller,
-    required this.optionLetter,
-    required this.hint,
-    required this.value,
-    required this.groupValue,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.black12),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            width: 40,
-            height: 40,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF69D1E9),
-                  Color(0xFF75D6AB),
-                  Color(0xFF7BD98D),
-                  Color(0xFF81DC6E),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              optionLetter,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-          ),
-          Expanded(
-            child: TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                hintText: hint,
-                border: InputBorder.none,
-              ),
-            ),
-          ),
-          Radio<int>(
-            value: value,
-            groupValue: groupValue,
-            onChanged: onChanged,
-            activeColor: Colors.blue,
-          ),
-        ],
-      ),
-    );
-  }
-}

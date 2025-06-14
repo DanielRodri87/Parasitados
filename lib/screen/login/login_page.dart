@@ -139,19 +139,21 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
                     onImageSelected: (path) => setState(() => foto2 = path),
                   ),
                   const SizedBox(height: 30),
-                  ElevatedButton(
-                    onPressed: (nome1.isNotEmpty && nome2.isNotEmpty)
-                        ? () async {
-                            try {
-                              await salvarNoBanco();
-                              Navigator.pushNamed(context, Routes.loadingScreen);
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Erro ao salvar os dados: $e')),
-                              );
-                            }
-                          }
-                        : null,
+				  ElevatedButton(
+					onPressed: (nome1.isNotEmpty && nome2.isNotEmpty)
+						? () async {
+						try {
+							await salvarNoBanco();
+							if (!context.mounted) return;
+							Navigator.pushNamed(context, Routes.loadingScreen);
+						} catch (e) {
+							if (!context.mounted) return;
+							ScaffoldMessenger.of(context).showSnackBar(
+								SnackBar(content: Text('Erro ao salvar os dados: $e')),
+							);
+						}
+						}
+						: null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF00DB8F),
                       shape: RoundedRectangleBorder(

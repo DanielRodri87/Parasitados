@@ -39,9 +39,36 @@ void testeLerDadosRedis(){
 	});
 }
 
+void testeAddOrUpdateQuestion() {
+	test('Testa addOrUpdateQuestion insere e recupera corretamente', () async {
+		final db = QuestionDatabase();
+		await db.connectRedis();
+
+		final int id = 9999;
+		final Map<String, dynamic> question = {
+			'pergunta': 'Pergunta de teste',
+			'resposta': 'a',
+			'alternativas': [
+				{'a': 'Alternativa A'},
+				{'b': 'Alternativa B'},
+				{'c': 'Alternativa C'},
+				{'d': 'Alternativa D'},
+			]
+		};
+
+		await db.addOrUpdateQuestion(id, question);
+		final result = await db.getQuestion(id);
+
+		expect(result, isNotNull);
+		expect(result!['pergunta'], 'Pergunta de teste');
+		expect(result['alternativas'][0]['a'], 'Alternativa A');
+	});
+}
+
 void main() async {
 	await dotenv.load(fileName: ".env");
 	testeConexaoRedis();
 	// testeInserirDadosRedis();
 	testeLerDadosRedis();
+	testeAddOrUpdateQuestion();
 }
