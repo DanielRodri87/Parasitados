@@ -10,35 +10,6 @@ void testeQuestoesJson(){
 	});
 }
 
-void addQuestoesQuestion(){
-	test("Testa o metodo adicionar de Questions", () async {
-		final questions = await Questions.fromJsonFile();
-		// Testa se a resposta da primeira questão é "d"
-		int quantidade = questions.id;
-		await questions.addQuestion({
-			"pergunta": "Quais são as duas formas evolutivas apresentadas pela Leishmania sp?",
-			"resposta": "b",
-			"alternativas": [
-				{
-				"a": "Amastigota e tripomastigota"
-				},
-				{
-				"b": "Amastigota e promastigota"
-				},
-				{
-				"c": "Epimastigota e promastigota"
-				},
-				{
-				"d": "Tripomastigota e epimastigota"
-				}
-			]
-			});
-
-		expect(questions.id, quantidade+1); // 'd' vira 4
-	});
-}
-
 void main(){
 	testeQuestoesJson();
-	addQuestoesQuestion();
 }

@@ -28,31 +28,67 @@ class Questions {
 		return questions;
   	}
 
-	Future<void> addQuestion(Map<String, dynamic> questionData) async {
-    final file = File(jsonPath);
-    final jsonString = await file.readAsString();
-    final List<dynamic> data = json.decode(jsonString);
+	Future<int> addQuestion(Map<String, dynamic> questionData) async {
+		final file = File(jsonPath);
+		final jsonString = await file.readAsString();
+		final List<dynamic> data = json.decode(jsonString);
 
-    // Gera novo id único
-    int newId = 1;
-    final existingIds = <int>{};
-    for (var q in data) {
-      final idStr = q.keys.first;
-      final idInt = int.tryParse(idStr);
-      if (idInt != null) existingIds.add(idInt);
-    }
-    while (existingIds.contains(newId)) {
-      newId++;
-    }
+		int newId = quantQuestion + 1;
 
-    // Adiciona a nova questão mantendo o formato original
-    data.add({newId.toString(): questionData});
+		data.add({newId.toString(): questionData});
 
-    final encoder = JsonEncoder.withIndent('  ');
-    await file.writeAsString(encoder.convert(data), flush: true);
-    questoes[newId] = Question.fromJson(newId, questionData);
-    id = newId;
-  }
+		final encoder = JsonEncoder.withIndent('  ');
+		await file.writeAsString(encoder.convert(data), flush: true);
+		questoes[newId] = Question.fromJson(newId, questionData);
+		id = newId;
+
+		return newId;
+	}
+
+	Future<bool> delQuestion(int id) async {
+		try {
+			final file = File(jsonPath);
+			final jsonString = await file.readAsString();
+			final List<dynamic> data = json.decode(jsonString);
+
+			// Remove a questão do arquivo JSON
+			data.removeWhere((element) => element.keys.first == id.toString());
+
+			final encoder = JsonEncoder.withIndent('  ');
+			await file.writeAsString(encoder.convert(data), flush: true);
+
+			// Remove do mapa em memória
+			questoes.remove(id);
+			return true;
+		} catch (e) {
+			return false;
+		}
+	}
+
+	Future<bool> updateQuestion(int id, Question question) async {
+		try {
+			final file = File(jsonPath);
+			final jsonString = await file.readAsString();
+			final List<dynamic> data = json.decode(jsonString);
+
+			// Atualiza a questão no arquivo JSON
+			for (int i = 0; i < data.length; i++) {
+				if (data[i].keys.first == id.toString()) {
+					data[i] = {id.toString(): question.toJson()};
+					break;
+				}
+			}
+
+			final encoder = JsonEncoder.withIndent('  ');
+			await file.writeAsString(encoder.convert(data), flush: true);
+
+			// Atualiza no mapa em memória
+			questoes[id] = question;
+			return true;
+		} catch (e) {
+			return false;
+		}
+	}
 
 	static Future<List<dynamic>> getAllQuestionsJson(String jsonPath) async {
 		final file = File(jsonPath);
@@ -74,5 +110,4 @@ class Questions {
 		final file = File(jsonPath);
 		await file.writeAsString(encoder.convert(data), flush: true);
 	}
-
 }

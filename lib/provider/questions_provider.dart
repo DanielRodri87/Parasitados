@@ -9,18 +9,11 @@ class QuestionsProvider extends ChangeNotifier {
 	Questions get questions => _questions;
 	bool _hasSynced = false;
 
+	Map<int, Question> get allQuestions => _questions.questoes;
+
 	Future<void> loadFromJson() async {
 		_questions = await Questions.fromJsonFile();
 		notifyListeners();
-	}
-
-	Future<void> addQuestion(Map<String, dynamic> questionData) async {
-		await _questions.addQuestion(questionData);
-		notifyListeners();
-	}
-
-	Question? getQuestion(int id) {
-		return _questions.getQuestion(id);
 	}
 
 	Future<void> syncAllQuestionsDatabaseToLocal(BuildContext context) async {
@@ -39,7 +32,7 @@ class QuestionsProvider extends ChangeNotifier {
 			_questions.quantQuestion;
 			debugPrint('Carregado do json ${_questions.quantQuestion}');
 		} else {
-			// Se não houver nada no JSON, carrega do banco de dados
+			if(!context.mounted) return;
 			final dbProvider = Provider.of<QuestionDatabaseProvider>(context, listen: false);
 			final syncedQuestions = await dbProvider.syncToLocal();
 			if (syncedQuestions != null) {
@@ -50,6 +43,4 @@ class QuestionsProvider extends ChangeNotifier {
 		_hasSynced = true;
 		notifyListeners();
 	}
-	
-	Map<int, Question> get allQuestions => _questions.questoes;
 }

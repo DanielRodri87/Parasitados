@@ -1,7 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parasitados/class/questions/questions.dart';
+import 'package:parasitados/class/questions/question.dart';
 import 'package:parasitados/database/question_database.dart';
+import 'package:parasitados/service/question_sync_service.dart';
 
 void testeConexaoRedis(){
 	test("Testando conexao com o redis", () async {
@@ -35,7 +38,7 @@ void testeQuantidadeQuestoesRedis() {
 
 		// Carrega questões do JSON
 		final questions = await Questions.fromJsonFile();
-		final int quantJson = questions.getQuantQuestion();
+		final int quantJson = questions.quantQuestion;
 
 		// Carrega questões do Redis
 		final allQuestionsRedis = await db.getAllQuestions();
@@ -55,53 +58,80 @@ void testeLerDadosRedis(){
 	});
 }
 
-void testeUpdateQuestion() {
-	test('Testa updateQuestion atualiza a pergunta corretamente', () async {
+void testeSincronizacao() {
+	test('Testa sincronização add, update e del no JSON e Redis via QuestionSyncService', () async {
+		// Setup
+		final questions = await Questions.fromJsonFile();
 		final db = QuestionDatabase();
 		await db.connectRedis();
 
-		final int id = 1;
-		final Map<String, dynamic> question = {
-			'pergunta': 'Pergunta de teste',
+		// ADD
+		final Map<String, dynamic> questionData = {
+			'pergunta': 'Pergunta de sync teste',
 			'resposta': 'a',
 			'alternativas': [
-				{'a': 'Alternativa A'},
-				{'b': 'Alternativa B'},
-				{'c': 'Alternativa C'},
-				{'d': 'Alternativa D'},
+				{'a': 'A'},
+				{'b': 'B'},
+				{'c': 'C'},
+				{'d': 'D'},
 			]
 		};
+		final addResult = await QuestionSyncService.addQuestionSync(
+			questionData: questionData,
+			questions: questions,
+			db: db,
+		);
+		expect(addResult, questions.quantQuestion,reason: 'Ids diferentes, tome cuidado');
+		debugPrint('$addResult == ${questions.quantQuestion}');
 
-		await db.updateQuestion(id, question);
-		final result = await db.getQuestion(id);
+		// UPDATE
+		final int lastId = questions.id;
+		final updatedQuestion = Question(
+			id: lastId,
+			enunciado: 'Pergunta de sync teste atualizada',
+			opcoes: [
+				{'a': 'A'},
+				{'b': 'B'},
+				{'c': 'C'},
+				{'d': 'D'},
+			],
+			respostaCorreta: 1,
+		);
+		final updateResult = await QuestionSyncService.updateQuestionSync(
+			id: lastId,
+			question: updatedQuestion,
+			questions: questions,
+			db: db,
+		);
+		expect(updateResult, true);
 
-		expect(result, isNotNull);
-		expect(result!['pergunta'], 'Pergunta de teste');
-		expect(result['alternativas'][0]['a'], 'Alternativa A');
+		// DEL
+		final delResult = await QuestionSyncService.delQuestionSync(
+			id: lastId,
+			questions: questions,
+			db: db,
+		);
+		expect(delResult, true);
 	});
 }
 
-void testeAddQuestion() {
-	test('Testa addQuestion insere e recupera corretamente', () async {
+void testeIdsPresentesNoRedis() {
+	test('Verifica ids presentes no Redis mas não no JSON', () async {
 		final db = QuestionDatabase();
 		await db.connectRedis();
 
-		final Map<String, dynamic> question = {
-			'pergunta': 'Pergunta de teste',
-			'resposta': 'a',
-			'alternativas': [
-				{'a': 'Alternativa A'},
-				{'b': 'Alternativa B'},
-				{'c': 'Alternativa C'},
-				{'d': 'Alternativa D'},
-			]
-		};
-		Questions questions = await db.databaseToLocal();
-		await db.addQuestion(questions, question);
-		final result = await db.getQuestion(questions.getQuantQuestion());
+		// Carrega ids do Redis
+		final allQuestionsRedis = await db.getAllQuestions();
+		final redisIds = allQuestionsRedis.keys.toSet();
 
-		expect(result!['pergunta'], 'Pergunta de teste');
-		db.delQuestion(questions.getQuantQuestion());
+		// Carrega ids do JSON
+		final data = await Questions.getAllQuestionsJson(Questions.jsonPath);
+		final jsonIds = data.map((q) => int.parse(q.keys.first)).toSet();
+
+		// Descobre ids que estão no Redis mas não no JSON
+		final onlyInRedis = redisIds.difference(jsonIds);
+		debugPrint('IDs presentes no Redis mas não no JSON: $onlyInRedis');
+		expect(onlyInRedis.isEmpty, true, reason: 'Existem ids no Redis que não estão no JSON');
 	});
 }
 
@@ -110,7 +140,7 @@ void main() async {
 	testeConexaoRedis();
 	testeInserirDadosRedis();
 	testeLerDadosRedis();
+	testeSincronizacao();
 	testeQuantidadeQuestoesRedis();
-	testeUpdateQuestion();
-	testeAddQuestion();
+	testeIdsPresentesNoRedis();
 }

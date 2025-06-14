@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:parasitados/class/questions/questions.dart';
 import 'package:parasitados/database/question_database.dart';
-import 'package:parasitados/provider/questions_provider.dart';
-import 'package:provider/provider.dart';
-
 class QuestionDatabaseProvider extends ChangeNotifier {
 	final QuestionDatabase _db = QuestionDatabase();
 	bool _isConnected = false;
@@ -32,24 +29,6 @@ class QuestionDatabaseProvider extends ChangeNotifier {
 
 	Future<Map<String, dynamic>?> getQuestion(int id) async {
 		return await _db.getQuestion(id);
-	}
-
-	Future<int> updateQuestion(int id, Map<String, dynamic> question) async {
-		int retorno = -1;
-		await _db.updateQuestion(id, question);
-		retorno = id;
-		notifyListeners();
-		return retorno;
-	}
-
-	Future<int> addQuestion(Map<String, dynamic> question, BuildContext context) async {
-		int retorno = -1;
-		Questions questions = Provider.of<QuestionsProvider>(context,listen:false).questions;
-		
-		retorno = await _db.addQuestion(questions, question);
-		
-		notifyListeners();
-		return retorno;
 	}
 
 	Future<Questions?> syncToLocal() async {

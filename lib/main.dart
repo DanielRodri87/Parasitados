@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:parasitados/provider/question_database_provider.dart';
 import 'package:parasitados/provider/questions_provider.dart';
+import 'package:parasitados/provider/questions_sync_provider.dart';
 import 'package:parasitados/screen/about/about.dart';
 import 'package:parasitados/screen/questions/add_questions.dart';
 import 'package:parasitados/screen/questions/home.dart';
@@ -31,6 +32,7 @@ Future<void> main() async {
 			providers: [
 				ChangeNotifierProvider(create: (_) => QuestionDatabaseProvider()),
 				ChangeNotifierProvider(create: (_) => QuestionsProvider()),
+				ChangeNotifierProvider(create: (_) => QuestionsSyncProvider()),
 			],
 			child: MyApp(),
 		)

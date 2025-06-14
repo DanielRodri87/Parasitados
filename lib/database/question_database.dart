@@ -62,8 +62,19 @@ class QuestionDatabase {
 		}
 	}
 
-	// Carrega perguntas do arquivo JSON e insere no Redis
+	// Carrega perguntas do arquivo JSON e insere no Redis, excluindo a key 'questions' antes
 	Future<void> loadQuestionsToRedis(String jsonPath) async {
+		// Exclui a key 'questions' do Redis antes de inserir os novos dados
+		try {
+			if (useUpstash) {
+				await _upstashRedis!.del(['questions']);
+			} else {
+				await _localRedis!.send_object(['DEL', 'questions']);
+			}
+		} catch (e) {
+			debugPrint('Erro ao excluir a key questions: $e');
+		}
+
 		final file = File(jsonPath);
 		final jsonString = await file.readAsString();
 		final List<dynamic> data = json.decode(jsonString);
@@ -82,9 +93,11 @@ class QuestionDatabase {
 
 	// Adiciona/atualiza uma questão no Redis, usando o próximo id do cache se não for informado
 	Future<int> addQuestion(Questions questions, Map<String, dynamic> question) async {
-		final questionId = await getNextQuestionIdFromCache(questions);
-
+		final questionId = questions.quantQuestion;
+		debugPrint('$questionId');
+		
 		await hset('questions', {questionId.toString(): json.encode(question)});
+		questions.questoes[questionId] = Question.fromJson(questionId, question);
 
 		return questionId;
 	}
@@ -143,7 +156,6 @@ class QuestionDatabase {
 		return questions;
 	}
   
-	// Obtém o próximo id disponível usando a instância Questions (cache local)
 	Future<int> getNextQuestionIdFromCache(Questions questions) async {
 		if (questions.questoes.isEmpty) {
 			// Se não houver questões, começa do 1

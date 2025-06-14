@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:parasitados/partials/add_questions/option_tile.dart';
 import 'package:parasitados/provider/question_database_provider.dart';
 import 'package:parasitados/provider/questions_provider.dart';
+import 'package:parasitados/provider/questions_sync_provider.dart';
 import 'package:provider/provider.dart';
 import '../../database/database.dart';
 
@@ -52,12 +53,12 @@ class _AddQuestionsScreenState extends State<AddQuestionsScreen> {
 				{"d": opcaoD},
 			]
 		};
-		int retorno = await Provider.of<QuestionDatabaseProvider>(context,listen: false).addQuestion(
+
+		int retorno = await Provider.of<QuestionsSyncProvider>(context,listen: false).addQuestion(
 			dados,
-			context
+			questions: Provider.of<QuestionsProvider>(context,listen: false).questions,
+			db: Provider.of<QuestionDatabaseProvider>(context,listen: false).db,
 		);
-		
-		if(mounted) await Provider.of<QuestionsProvider>(context,listen:false).addQuestion(dados);
 
 		if(mounted){
 			ScaffoldMessenger.of(context).showSnackBar(
