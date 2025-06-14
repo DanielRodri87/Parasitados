@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:parasitados/routes/routes.dart';
 import 'package:sqflite/sqflite.dart';
-import '../questions/loading_game.dart';
 import '../../database/database.dart';
-import '../about/about.dart'; // Adicione esta importação
-
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -147,13 +144,8 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
                         ? () async {
                             try {
                               await salvarNoBanco();
-                              Navigator.push(
-                                // ignore: use_build_context_synchronously
-                                context,
-                                MaterialPageRoute(builder: (context) => const LoadingGamePage()),
-                              );
+                              Navigator.pushNamed(context, Routes.loadingScreen);
                             } catch (e) {
-                              // ignore: use_build_context_synchronously
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text('Erro ao salvar os dados: $e')),
                               );
@@ -179,10 +171,7 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
                   TextButton(
                     onPressed: () {
                       // Navegação para a tela about.dart
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const LadoparScreen()),
-                      );
+                      Navigator.pushNamed(context, Routes.aboutScreen);
                     },
                     child: const Text(
                       'Entre em Contato\nSobre Nós',

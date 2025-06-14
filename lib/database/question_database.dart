@@ -1,52 +1,80 @@
+import 'package:flutter/material.dart';
+import 'package:parasitados/class/questions/question.dart';
+import 'package:parasitados/class/questions/questions.dart';
+import 'package:upstash_redis/upstash_redis.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'dart:io';
-import 'package:redis/redis.dart';
-
-//Quero fazer com que o banco se conecte ao redis insira os dados .json no redis
-//Depois, quando ja tiver as perguntas, quero adicionar dados ao redis e salvar
-//E passe para todos os celulares as questões atualizadas
 
 class QuestionDatabase {
-  late RedisConnection _connection;
-  late Command _redis;
+	late final Redis _redis;
 
-  // Conecta ao Redis
-  Future<void> connectRedis({String host = 'localhost', int port = 6379}) async {
-    _connection = RedisConnection();
-    _redis = await _connection.connect(host, port);
-  }
+	Future<bool> connectRedis() async {
+		bool retorno = false;
 
-  // Carrega perguntas do arquivo JSON e insere no Redis
-  Future<void> loadQuestionsToRedis(String jsonPath) async {
-    final file = File(jsonPath);
-    final jsonString = await file.readAsString();
-    final List<dynamic> data = json.decode(jsonString);
-    for (var q in data) {
-      q.forEach((key, value) async {
-        await _redis.send_object(['HSET', 'questions', key, json.encode(value)]);
-      });
-    }
-  }
+		await dotenv.load(fileName: ".env");
+		final url = dotenv.env['UPSTASH_REDIS_REST_URL']!;
+		final token = dotenv.env['UPSTASH_REDIS_REST_TOKEN']!;
+		try {
+			_redis = Redis(url: url, token: token);
+			retorno = true;
+		} catch (e) {
+			debugPrint("Erro ao conectar ao banco!");
+		}
+		return retorno;
+	}
 
-  // Adiciona/atualiza uma questão no Redis
-  Future<void> addOrUpdateQuestion(int id, Map<String, dynamic> question) async {
-    await _redis.send_object(['HSET', 'questions', id.toString(), json.encode(question)]);
-  }
+	// Carrega perguntas do arquivo JSON e insere no Redis Upstash
+	Future<void> loadQuestionsToRedis(String jsonPath) async {
+		final file = File(jsonPath);
+		final jsonString = await file.readAsString();
+		final List<dynamic> data = json.decode(jsonString);
+		for (var q in data) {
+			q.forEach((key, value) async {
+				await _redis.hset('questions', {key: json.encode(value)});
+			});
+		}
+	}
 
-  // Busca todas as questões do Redis
-  Future<Map<String, dynamic>> getAllQuestions() async {
-    final result = await _redis.send_object(['HGETALL', 'questions']);
-    final Map<String, dynamic> questions = {};
-    for (int i = 0; i < result.length; i += 2) {
-      questions[result[i]] = json.decode(result[i + 1]);
-    }
-    return questions;
-  }
+	// Adiciona/atualiza uma questão no Redis Upstash
+	Future<void> addOrUpdateQuestion(int id, Map<String, dynamic> question) async {
+		await _redis.hset('questions', {id.toString(): json.encode(question)});
+	}
 
-  // Sincroniza questões para todos os dispositivos (exemplo: retorna todas as questões)
-  Future<List<Map<String, dynamic>>> syncQuestions() async {
-    final all = await getAllQuestions();
-    return all.entries.map((e) => {e.key: e.value}).toList();
-  }
+	// Busca todas as questões do Redis Upstash
+	Future<Map<int, dynamic>> getAllQuestions() async {
+		final result = await _redis.hgetall('questions');
+		final Map<int, dynamic> questions = {};
+		result?.forEach((key, value) {
+			// Garante que value é int antes de decodificar
+			if (value is String) {
+				questions[int.parse(key)] = json.decode(value);
+			} else {
+				questions[int.parse(key)] = value;
+			}
+		});
+		return questions;
+	}
 
+	Future<Map<String, dynamic>?> getQuestion(int id) async {
+		// Busca todas as questões e procura pelo id
+		final all = await getAllQuestions();
+		if (all.containsKey(id)) {
+			return all[id];
+		} else {
+			debugPrint('No value found for id: $id');
+			return null;
+		}
+	}
+
+	Future<Questions> databaseToLocal() async {
+		Map<int,dynamic> questoes = await getAllQuestions();
+		late Questions questions = Questions();
+
+		questions.questoes = Map.fromEntries(
+		  questoes.entries.map((entry) => MapEntry(entry.key, Question.fromJson(entry.key, entry.value)))
+		);
+
+		return questions;
+	}
 }

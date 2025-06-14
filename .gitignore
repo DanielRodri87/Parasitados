@@ -47,3 +47,5 @@ app.*.map.json
 # Python virtual environment
 venv/
 python/
+
+.env

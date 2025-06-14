@@ -58,4 +58,8 @@ class Questions {
 		final List<dynamic> data = json.decode(jsonString);
 		return data;
 	}
+
+	Question? getQuestion(int id){
+		return questoes[id];
+	}
 }
