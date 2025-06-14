@@ -51,9 +51,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   // Map for animal names in Portuguese
   final Map<String, String> animalNames = {
-    'barata': 'Barata',
-    'minhoca': 'Minhoca',
-    'azul': 'Azul',
+    'barata': 'Ectoparasitas',
+    'minhoca': 'Helmintos',
+    'azul': 'Protozoários',
   };
 
   @override
@@ -76,6 +76,12 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _confettiAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _confettiController, curve: Curves.easeOut),
     );
+
+    _loadPlayers().then((_) {
+      setState(() {
+        currentPlayer = player1Name;
+      });
+    });
   }
 
   Future<void> _loadPlayers() async {
@@ -170,118 +176,97 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-				  color: Colors.black.withAlpha((0.1 * 255).toInt()),
+                  color: Colors.black.withAlpha((0.1 * 255).toInt()),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),
               ],
             ),
-            child: Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(height: 10),
-                      Text(
-                        result == 'passar_vez' ? 'Passou a vez!' : 'Você tirou:',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      if (result != 'passar_vez') ...[
-                        Image.asset(
-                          coloredAnimalImages[result]!,
-                          width: 100,
-                          height: 100,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          animalNames[result]!,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ] else ...[
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF81DC6E).withAlpha((0.1 * 255).toInt()),
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: const Icon(
-                            Icons.skip_next_rounded,
-                            size: 60,
-                            color: Color(0xFF81DC6E),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Próximo jogador',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 32),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            if (result != 'passar_vez') {
-                              _respond();
-                            } else {
-                              _passTheTurn();
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF69D1E9),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: Text(
-                            result == 'passar_vez' ? 'Continuar' : 'Responder',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      if (result == 'passar_vez') {
-                        _passTheTurn();
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.close,
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 10),
+                  Text(
+                    result == 'passar_vez' ? 'Passou a vez!' : 'Você tirou:',
+                    style: const TextStyle(
+                      fontSize: 18,
                       color: Colors.grey,
-                      size: 24,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 24),
+                  if (result != 'passar_vez') ...[
+                    Image.asset(
+                      coloredAnimalImages[result]!,
+                      width: 100,
+                      height: 100,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      animalNames[result]!,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ] else ...[
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF81DC6E).withAlpha((0.1 * 255).toInt()),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: const Icon(
+                        Icons.skip_next_rounded,
+                        size: 60,
+                        color: Color(0xFF81DC6E),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Próximo jogador',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        if (result != 'passar_vez') {
+                          _respond();
+                        } else {
+                          _passTheTurn();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF69D1E9),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        result == 'passar_vez' ? 'Continuar' : 'Responder',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -291,7 +276,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   void _passTheTurn() {
     setState(() {
-      currentPlayer = currentPlayer == 'Jogador 1' ? 'Jogador 2' : 'Jogador 1';
+      currentPlayer = currentPlayer == player1Name ? player2Name : player1Name;
       selectedAnimal = null;
     });
   }
@@ -308,7 +293,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             setState(() {
               if (isCorrect) {
                 // Adiciona a conquista apenas se acertou
-                if (currentPlayer == 'Jogador 1') {
+                if (currentPlayer == player1Name) {
                   if (!player1Animals.contains(selectedAnimal!)) {
                     player1Animals.add(selectedAnimal!);
                   }
@@ -321,7 +306,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 _checkForWinner();
               } else {
                 // Se errou, muda o jogador
-                currentPlayer = currentPlayer == 'Jogador 1' ? 'Jogador 2' : 'Jogador 1';
+                currentPlayer = currentPlayer == player1Name ? player2Name : player1Name;
               }
               selectedAnimal = null; // Reset para próxima rodada
             });
@@ -531,7 +516,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         winner = null;
                         player1Animals.clear();
                         player2Animals.clear();
-                        currentPlayer = 'Jogador 1';
+                        currentPlayer = player1Name;
                         selectedAnimal = null;
                       });
                       _confettiController.stop();
@@ -629,7 +614,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   player1Name, 
                                   player1Photo, 
                                   player1Animals, 
-                                  currentPlayer == 'Jogador 1'
+                                  currentPlayer == player1Name
                                 ),
                                 Container(
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -642,7 +627,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   player2Name, 
                                   player2Photo, 
                                   player2Animals, 
-                                  currentPlayer == 'Jogador 2'
+                                  currentPlayer == player2Name
                                 ),
                               ],
                             ),

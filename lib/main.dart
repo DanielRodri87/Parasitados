@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
 		Routes.questoesDisponiveis: (context) => QuestionsDisponivel(),
 		Routes.questionScreen: (context) => HomePage(),
 		Routes.addQuestion: (context) => AddQuestionsScreen(),
-		Routes.aboutScreen: (context) => LadoparScreen(),
+		Routes.aboutScreen: (context) => AboutPage(),
 		Routes.loadingScreen: (context) => LoadingGamePage(),
 	  },
     );

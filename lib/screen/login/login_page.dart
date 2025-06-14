@@ -168,20 +168,6 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  TextButton(
-                    onPressed: () {
-                      // Navegação para a tela about.dart
-                      Navigator.pushNamed(context, Routes.aboutScreen);
-                    },
-                    child: const Text(
-                      'Entre em Contato\nSobre Nós',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFF00DB8F),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
