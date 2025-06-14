@@ -1,27 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:parasitados/class/questions/questions.dart';
 import 'package:parasitados/database/question_database.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class QuestionDatabaseProvider extends ChangeNotifier {
 	final QuestionDatabase _db = QuestionDatabase();
 	bool _isConnected = false;
 	bool get isConnected => _isConnected;
+	bool _isConnecting = false;
 
 	QuestionDatabase get db => _db;
 
-	QuestionDatabaseProvider() {
-		connect();
+	Future<void> _initOnce() async {
+		if (!_isConnected && !_isConnecting) {
+			_isConnecting = true;
+			_isConnected = await _db.connectRedis();
+			_isConnecting = false;
+			notifyListeners();
+		}
 	}
 
 	Future<void> connect() async {
-		final prefs = await SharedPreferences.getInstance();
-		if(prefs.getString('questions_cache') == null){
-			_isConnected = await _db.connectRedis();
-		}else{
-			_isConnected = true;
-		}
-		notifyListeners();
+		await _initOnce();
 	}
 
 	Future<void> reloadQuestionsFromJson(String jsonPath) async {
@@ -37,17 +36,15 @@ class QuestionDatabaseProvider extends ChangeNotifier {
 		return await _db.getQuestion(id);
 	}
 
-	Future<void> addOrUpdateQuestion(int id, Map<String, dynamic> question) async {
+	Future<int> addOrUpdateQuestion(int id, Map<String, dynamic> question) async {
+		int retorno = -1;
 		await _db.addOrUpdateQuestion(id, question);
+		retorno = id;
 		notifyListeners();
+		return retorno;
 	}
 
 	Future<Questions?> syncToLocal() async {
-		if(!_isConnected){
-			await connect();
-			return await _db.databaseToLocal();
-		}else{
-			return null;
-		}
+		return await _db.databaseToLocal();
 	}
 }

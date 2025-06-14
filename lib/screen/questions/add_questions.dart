@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:parasitados/class/questions/questions.dart';
 import 'package:parasitados/partials/add_questions/option_tile.dart';
 import 'package:parasitados/provider/question_database_provider.dart';
+import 'package:parasitados/provider/questions_provider.dart';
 import 'package:provider/provider.dart';
 import '../../database/database.dart';
 
@@ -32,23 +32,19 @@ class _AddQuestionsScreenState extends State<AddQuestionsScreen> {
 		final opcaoD = opcaoDController.text.trim();
 
 		if (enunciado.isEmpty ||
-			opcaoA.isEmpty ||
-			opcaoB.isEmpty ||
-			opcaoC.isEmpty ||
-			opcaoD.isEmpty ||
-			selectedOption == null) {
-			ScaffoldMessenger.of(context).showSnackBar(
-			const SnackBar(content: Text('Preencha todos os campos e selecione a correta')),
+				opcaoA.isEmpty ||
+				opcaoB.isEmpty ||
+				opcaoC.isEmpty ||
+				opcaoD.isEmpty ||
+				selectedOption == null) {
+				ScaffoldMessenger.of(context).showSnackBar(
+				const SnackBar(content: Text('Preencha todos os campos e selecione a correta')),
 			);
 			return;
 		}
 
-		// // Carrega as questões existentes do JSON
-		// final jsonPath = 'assets/pdf/questions.json';
-		
-
-		await Provider.of<QuestionDatabaseProvider>(context,listen: false).addOrUpdateQuestion(
-			Questions.id + 1,
+		int retorno = await Provider.of<QuestionDatabaseProvider>(context,listen: false).addOrUpdateQuestion(
+			Provider.of<QuestionsProvider>(context,listen: false).questions.id + 1,
 			{
 			'pergunta': enunciado,
 			'resposta': String.fromCharCode(96 + selectedOption!), // 1->a, 2->b, etc
@@ -63,7 +59,7 @@ class _AddQuestionsScreenState extends State<AddQuestionsScreen> {
 		
 		if(mounted){
 			ScaffoldMessenger.of(context).showSnackBar(
-				const SnackBar(content: Text('Questão cadastrada com sucesso no JSON')),
+				SnackBar(content: Text('Questão cadastrada com sucesso no Banco de Dados $retorno')),
 			);
 		}
 

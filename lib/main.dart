@@ -40,17 +40,8 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
 	const MyApp({super.key});
 
-	
-
 	@override
 	Widget build(BuildContext context) {
-
-		Future<void> sincronizandoDados() async {
-			await Provider.of<QuestionsProvider>(context,listen:false).syncAllQuestionsDatabaseToLocal(context);
-		}
-
-		sincronizandoDados();
-
 		return MaterialApp(
 		debugShowCheckedModeBanner: false,
 		initialRoute: Routes.home,
@@ -61,6 +52,20 @@ class MyApp extends StatelessWidget {
 			Routes.addQuestion: (context) => AddQuestionsScreen(),
 			Routes.aboutScreen: (context) => AboutPage(),
 			Routes.loadingScreen: (context) => LoadingGamePage(),
+		},
+		builder: (context, child) {
+			
+			Future.microtask(() async {
+				await Provider.of<QuestionDatabaseProvider>(context, listen: false).connect();
+			});
+
+			// Sincroniza dados apenas uma vez, após o primeiro frame
+			Future.microtask(() async {
+				await Provider.of<QuestionsProvider>(context, listen: false).syncAllQuestionsDatabaseToLocal(context);
+			});
+
+
+			return child!;
 		},
 		);
 	}

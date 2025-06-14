@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:parasitados/class/questions/question.dart';
 
 class Questions {
-	static int id = 0;
+	int id = 0;
 	Map<int,Question> questoes = {};
 
 	Questions();
@@ -22,16 +22,16 @@ class Questions {
 		};
 		// Atualiza o último id
 		if (questions.questoes.isNotEmpty) {
-			Questions.id = questions.questoes.keys.reduce((a, b) => a > b ? a : b);
+			questions.id = questions.questoes.keys.reduce((a, b) => a > b ? a : b);
 		} else {
-			Questions.id = 0;
+			questions.id = 0;
 		}
 		return questions;
 	}
 
 	int getQuantQuestion(){
-		Questions.id = questoes.keys.reduce((a, b) => a > b ? a : b);
-		return Questions.id;
+		id = questoes.keys.reduce((a, b) => a > b ? a : b);
+		return id;
 	}
 
 	// Renomeia o método estático para evitar conflito
@@ -39,10 +39,10 @@ class Questions {
 		final file = File(jsonPath);
 		final jsonString = await file.readAsString();
 		final List<dynamic> data = json.decode(jsonString);
-		Questions.id++;
+		id++;
 
 		// Gera o novo id
-		final newId = (Questions.id).toString();
+		final newId = id.toString();
 
 		// Adiciona a nova questão mantendo o formato original
 		data.add({newId: questionData});

@@ -14,7 +14,7 @@ void addQuestoesQuestion(){
 	test("Testa o metodo adicionar de Questions", () async {
 		final questions = await Questions.fromJsonFile("assets/pdf/questions.json");
 		// Testa se a resposta da primeira questão é "d"
-		int quantidade = Questions.id;
+		int quantidade = questions.id;
 		await questions.addQuestion("assets/pdf/questions.json",{
 			"pergunta": "Quais são as duas formas evolutivas apresentadas pela Leishmania sp?",
 			"resposta": "b",
@@ -34,7 +34,7 @@ void addQuestoesQuestion(){
 			]
 			});
 
-		expect(Questions.id, quantidade+1); // 'd' vira 4
+		expect(questions.id, quantidade+1); // 'd' vira 4
 	});
 }
 
