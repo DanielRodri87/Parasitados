@@ -5,27 +5,52 @@ import 'package:parasitados/database/question_database.dart';
 import 'package:parasitados/service/question_sync_service.dart';
 
 class QuestionsSyncProvider extends ChangeNotifier {
-	Future<void> loadFromJson({
-		required Questions questions
+
+	final QuestionDatabase _db = QuestionDatabase();
+	Questions _questions = Questions();
+
+	bool _isConnected = false;
+	bool _isConnecting = false;
+	bool _hasSynced = false;
+
+	QuestionDatabase get db => _db;
+	Questions get questions => _questions;
+	bool get isConnected => _isConnected;
+	Map<int, Question> get allQuestions => _questions.questoes;
+	
+	Future<void> connect() async {
+		if (!_isConnected && !_isConnecting) {
+			_isConnecting = true;
+			_isConnected = await _db.connectRedis();
+			_isConnecting = false;
+			notifyListeners();
+		}
 	}
-	) async {
-		final loaded = await Questions.fromJsonFile();
-		questions.questoes = loaded.questoes;
-		questions.id = loaded.id;
+
+	Future<void> reloadQuestionsFromJson(String jsonPath) async {
+		await _db.loadQuestionsToRedis(jsonPath);
 		notifyListeners();
+	}
+
+	Future<Map<int, dynamic>> getAllQuestions() async {
+		return await _db.getAllQuestions();
+	}
+
+	Future<Map<String, dynamic>?> getQuestion(int id) async {
+		return await _db.getQuestion(id);
+	}
+
+	Future<Questions?> syncToLocal() async {
+		return await _db.databaseToLocal();
 	}
 
 	Future<int> addQuestion(
 		Map<String, dynamic> questionData,
-		{
-			required Questions questions,
-			required QuestionDatabase db,
-		}
 	) async {
 		final result = await QuestionSyncService.addQuestionSync(
 			questionData: questionData,
 			questions: questions,
-			db: db,
+			db: _db,
 		);
 		notifyListeners();
 		return result;
@@ -33,16 +58,12 @@ class QuestionsSyncProvider extends ChangeNotifier {
 
 	Future<bool> updateQuestion(
 		int id, Question question,
-		{
-			required Questions questions,
-			required QuestionDatabase db,
-		}
 	) async {
 		final result = await QuestionSyncService.updateQuestionSync(
 			id: id,
 			question: question,
 			questions: questions,
-			db: db,
+			db: _db,
 		);
 		notifyListeners();
 		return result;
@@ -50,26 +71,46 @@ class QuestionsSyncProvider extends ChangeNotifier {
 
 	Future<bool> delQuestion(
 		int id,
-		{
-			required Questions questions,
-			required QuestionDatabase db,
-		}
 	) async {
 		final result = await QuestionSyncService.delQuestionSync(
 			id: id,
 			questions: questions,
-			db: db,
+			db: _db,
 		);
 		notifyListeners();
 		return result;
 	}
 
-	Question? getQuestion(
-		int id,
-		{
-			required Questions questions,
-		}
-	) {
-		return questions.getQuestion(id);
+	Future<void> loadFromJson() async {
+		_questions = await Questions.fromJsonFile();
+		notifyListeners();
 	}
+	
+	Future<void> syncAllQuestionsDatabaseToLocal(BuildContext context) async {
+		if (_hasSynced) return;
+
+		// Tenta carregar do arquivo JSON primeiro
+		Questions? loadedFromJson;
+		try {
+			loadedFromJson = await Questions.fromJsonFile();
+		} catch (_) {
+			loadedFromJson = null;
+		}
+
+		if (loadedFromJson != null && loadedFromJson.questoes.isNotEmpty) {
+			_questions = loadedFromJson;
+			_questions.quantQuestion;
+			debugPrint('Carregado do json ${_questions.quantQuestion}');
+		} else {
+			if(!context.mounted) return;
+			final syncedQuestions = await syncToLocal();
+			if (syncedQuestions != null) {
+				_questions = syncedQuestions;
+			}
+		}
+
+		_hasSynced = true;
+		notifyListeners();
+	}
+
 }

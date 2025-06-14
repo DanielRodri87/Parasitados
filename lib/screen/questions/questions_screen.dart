@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:parasitados/class/questions/question.dart';
 import 'dart:io';
-import 'package:parasitados/provider/questions_provider.dart';
+import 'package:parasitados/provider/questions_sync_provider.dart';
 import 'package:provider/provider.dart';
 
 class QuestionScreen extends StatefulWidget {
@@ -85,7 +85,7 @@ class _QuestionScreenState extends State<QuestionScreen>
 
   void _loadRandomQuestion()  {
     // Carrega todas as questões do JSON
-    final questions = Provider.of<QuestionsProvider>(context,listen: false).questions;
+    final questions = Provider.of<QuestionsSyncProvider>(context,listen: false).questions;
 
     final questoesList = questions.questoes.values.toList();
     if (questoesList.isNotEmpty) {
