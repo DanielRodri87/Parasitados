@@ -2,11 +2,17 @@ import 'dart:async';
 import 'dart:io'; // Importação necessária para usar File
 import 'dart:math' show Random;
 import 'package:flutter/material.dart';
-import '../../database/database.dart';
-import 'home.dart';
+import 'package:parasitados/class/mode_game/mode_game.dart';
+import 'package:parasitados/database/database.dart';
+import 'package:parasitados/routes/routes.dart';
 
 class LoadingGamePage extends StatefulWidget {
-  const LoadingGamePage({super.key});
+	final TypeModeGame tipoModeGame;
+
+  const LoadingGamePage({
+	super.key,
+	required this.tipoModeGame
+	});
 
   @override
   State<LoadingGamePage> createState() => _LoadingGamePageState();
@@ -37,7 +43,7 @@ class _LoadingGamePageState extends State<LoadingGamePage> {
   }
 
   void iniciarAnimacaoTexto() {
-    timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+    timer = Timer.periodic(const Duration(milliseconds: 300), (timer) {
       setState(() {
         pontoCount = (pontoCount + 1) % 4;
         carregandoTexto = 'Carregando${'.' * pontoCount}';
@@ -46,12 +52,13 @@ class _LoadingGamePageState extends State<LoadingGamePage> {
   }
 
   void iniciarTemporizador() {
-    Timer(const Duration(seconds: 30), () {
+    Timer(const Duration(seconds: 10), () {
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
+      	if (widget.tipoModeGame == TypeModeGame.umJogador) {
+			Navigator.pushReplacementNamed(context, Routes.questionScreenUmJogador);
+		}else{
+			Navigator.pushReplacementNamed(context, Routes.questionScreenDoisJogador);
+		}
     });
   }
 
@@ -113,8 +120,10 @@ class _LoadingGamePageState extends State<LoadingGamePage> {
               'assets/images/LogoApp.png',
               height: 200,
             ),
-            const Expanded(
-              child: PlayerInfoContainer(),
+            Expanded(
+              child: PlayerInfoContainer(
+                tipoModeGame: widget.tipoModeGame,
+              ),
             ),
           ],
         ),
@@ -124,7 +133,11 @@ class _LoadingGamePageState extends State<LoadingGamePage> {
 }
 
 class PlayerInfoContainer extends StatefulWidget {
-  const PlayerInfoContainer({super.key});
+	final TypeModeGame tipoModeGame;
+  const PlayerInfoContainer({
+	super.key,
+	required this.tipoModeGame
+	});
 
   @override
   State<PlayerInfoContainer> createState() => _PlayerInfoContainerState();
@@ -177,12 +190,13 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
   }
 
   void iniciarTemporizador() {
-    Timer(const Duration(seconds: 10), () {
+    Timer(const Duration(seconds: 5), () {
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
+		if (widget.tipoModeGame == TypeModeGame.umJogador) {
+			Navigator.pushReplacementNamed(context, Routes.questionScreenUmJogador);
+		}else{
+			Navigator.pushReplacementNamed(context, Routes.questionScreenDoisJogador);
+		}
     });
   }
 
@@ -234,57 +248,6 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: Image.asset(
-            'assets/images/back_login.png',
-            fit: BoxFit.fill,
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-          child: Column(
-            children: [
-              const SizedBox(height: 80), 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  playerCard(nome1, foto1),
-                  Image.asset(
-                    'assets/images/fite.png',
-                    width: 90,
-                  ),
-                  playerCard(nome2, foto2),
-                ],
-              ),
-              const Spacer(),
-              Text(
-                carregandoTexto,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                frases[fraseAtual],
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.black54,
-                ),
-              ),
-              const SizedBox(height: 30),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget playerCard(String nome, String? foto) {
     return Column(
       children: [
@@ -305,5 +268,65 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
         ),
       ],
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+	return Container(
+		width: double.infinity,
+		// height: double.infinity,
+		decoration: BoxDecoration(
+			image: DecorationImage(
+				image: AssetImage('assets/images/back_login.png'),
+				fit: BoxFit.fill,
+			)
+		),
+		padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 80),
+		child: Column(
+			mainAxisAlignment: MainAxisAlignment.spaceBetween,
+			children: [
+				if (widget.tipoModeGame == TypeModeGame.doisJogador)
+					Row(
+						mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+						children: [
+							playerCard(nome1, foto1),
+							Image.asset(
+								'assets/images/fite.png',
+								width: 90,
+							),
+							playerCard(nome2, foto2),
+						],
+					)
+				else
+					Column(
+						mainAxisAlignment: MainAxisAlignment.center,
+						children: [
+							playerCard(nome1, foto1),
+						],
+					),
+				Column(
+					spacing: 20,
+					children: [
+						Text(
+							carregandoTexto,
+							style: const TextStyle(
+								fontSize: 24,
+								fontWeight: FontWeight.bold,
+							),
+						),
+						Text(
+							frases[fraseAtual],
+							textAlign: TextAlign.center,
+							style: const TextStyle(
+							fontSize: 16,
+							color: Colors.black54,
+							),
+						),
+					],
+				)
+				
+			],
+		),
+	);
   }
 }

@@ -1,0 +1,4 @@
+enum TypeModeGame{
+	umJogador,
+	doisJogador
+}

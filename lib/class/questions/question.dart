@@ -11,7 +11,7 @@ class Question {
     required this.respostaCorreta,
   });
 
-  factory Question.fromJson(int id,Map<String, dynamic> json) {
+  factory Question.fromJson(int id, Map<String, dynamic> json) {
     return Question(
       id: json["id"] ?? id, // ou ajuste conforme necessário
       enunciado: json["pergunta"] ?? json["enunciado"] ?? '',
@@ -26,5 +26,17 @@ class Question {
     }
     if (resposta is int) return resposta;
     return 0;
+  }
+
+  Map<String, dynamic> toJson() {
+    // Converte respostaCorreta para letra (a, b, c, d) se necessário
+    String respostaLetra = respostaCorreta > 0
+        ? String.fromCharCode('a'.codeUnitAt(0) + respostaCorreta - 1)
+        : respostaCorreta.toString();
+    return {
+      'pergunta': enunciado,
+      'resposta': respostaLetra,
+      'alternativas': opcoes,
+    };
   }
 }

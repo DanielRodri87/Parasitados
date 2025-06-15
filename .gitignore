@@ -47,3 +47,7 @@ app.*.map.json
 # Python virtual environment
 venv/
 python/
+
+.env
+
+assets/pdf/questions.json

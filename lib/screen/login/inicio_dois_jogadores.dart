@@ -3,23 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:parasitados/routes/routes.dart';
 import 'package:sqflite/sqflite.dart';
-import '../questions/loading_game.dart';
 import '../../database/database.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class InicioDoisJogadores extends StatelessWidget {
+  const InicioDoisJogadores({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, Routes.addQuestion);
-        },
-        backgroundColor: const Color(0xFF00DB8F),
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -37,7 +29,20 @@ class LoginPage extends StatelessWidget {
         ),
         child: Column(
           children: [
-            const SizedBox(height: 60),
+			Row(
+				children: [
+					IconButton(
+						onPressed: (){
+							Navigator.pop(context);
+						}, 
+						icon: Icon(
+							Icons.arrow_back_outlined,
+							color: Colors.white,
+						)
+					)
+				],
+			),
+            const SizedBox(height: 30),
             Image.asset(
               'assets/images/LogoApp.png',
               height: 260,
@@ -140,24 +145,21 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
                     onImageSelected: (path) => setState(() => foto2 = path),
                   ),
                   const SizedBox(height: 30),
-                  ElevatedButton(
-                    onPressed: (nome1.isNotEmpty && nome2.isNotEmpty)
-                        ? () async {
-                            try {
-                              await salvarNoBanco();
-                              Navigator.push(
-                                // ignore: use_build_context_synchronously
-                                context,
-                                MaterialPageRoute(builder: (context) => const LoadingGamePage()),
-                              );
-                            } catch (e) {
-                              // ignore: use_build_context_synchronously
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Erro ao salvar os dados: $e')),
-                              );
-                            }
-                          }
-                        : null,
+				  ElevatedButton(
+					onPressed: (nome1.isNotEmpty && nome2.isNotEmpty)
+						? () async {
+						try {
+							await salvarNoBanco();
+							if (!context.mounted) return;
+							Navigator.pushNamed(context, Routes.loadingScreenDoisJogador);
+						} catch (e) {
+							if (!context.mounted) return;
+							ScaffoldMessenger.of(context).showSnackBar(
+								SnackBar(content: Text('Erro ao salvar os dados: $e')),
+							);
+						}
+						}
+						: null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF00DB8F),
                       shape: RoundedRectangleBorder(
