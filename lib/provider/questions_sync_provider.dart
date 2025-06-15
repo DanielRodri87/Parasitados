@@ -89,7 +89,6 @@ class QuestionsSyncProvider extends ChangeNotifier {
 	Future<void> syncAllQuestionsDatabaseToLocal(BuildContext context) async {
 		if (_hasSynced) return;
 
-		// Tenta carregar do arquivo JSON primeiro
 		Questions? loadedFromJson;
 		try {
 			loadedFromJson = await Questions.fromJsonFile();
@@ -107,6 +106,7 @@ class QuestionsSyncProvider extends ChangeNotifier {
 			if (syncedQuestions != null) {
 				_questions = syncedQuestions;
 			}
+			debugPrint('Carregado do banco ${_questions.quantQuestion}');
 		}
 
 		_hasSynced = true;

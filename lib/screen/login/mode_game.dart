@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:parasitados/routes/routes.dart';
-import 'login_page.dart';
-import 'single_login_page.dart';
+import 'package:parasitados/routes/routes.dart';
 import '../about/about.dart';  // Novo import
 
 class ModeGamePage extends StatefulWidget {
@@ -18,6 +16,13 @@ class _ModeGamePageState extends State<ModeGamePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
+	  floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, Routes.addQuestion);
+        },
+        backgroundColor: const Color(0xFF00DB8F),
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -121,9 +126,9 @@ class _GameModeSelector extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               if (selectedMode == 1) {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const SingleLoginPage()));
+                Navigator.pushNamed(context, Routes.umJogador);
               } else if (selectedMode == 2) {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginPage()));
+                Navigator.pushNamed(context, Routes.doisJogador);
               }
             },
             style: ElevatedButton.styleFrom(

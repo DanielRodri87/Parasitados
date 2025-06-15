@@ -5,20 +5,13 @@ import 'package:parasitados/routes/routes.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../database/database.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class InicioDoisJogadores extends StatelessWidget {
+  const InicioDoisJogadores({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, Routes.addQuestion);
-        },
-        backgroundColor: const Color(0xFF00DB8F),
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -36,7 +29,20 @@ class LoginPage extends StatelessWidget {
         ),
         child: Column(
           children: [
-            const SizedBox(height: 60),
+			Row(
+				children: [
+					IconButton(
+						onPressed: (){
+							Navigator.pop(context);
+						}, 
+						icon: Icon(
+							Icons.arrow_back_outlined,
+							color: Colors.white,
+						)
+					)
+				],
+			),
+            const SizedBox(height: 30),
             Image.asset(
               'assets/images/LogoApp.png',
               height: 260,
@@ -145,7 +151,7 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
 						try {
 							await salvarNoBanco();
 							if (!context.mounted) return;
-							Navigator.pushNamed(context, Routes.loadingScreen);
+							Navigator.pushNamed(context, Routes.loadingScreenDoisJogador);
 						} catch (e) {
 							if (!context.mounted) return;
 							ScaffoldMessenger.of(context).showSnackBar(

@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:parasitados/provider/questions_sync_provider.dart';
 import 'package:parasitados/screen/about/about.dart';
+import 'package:parasitados/screen/login/inicio_um_jogador.dart';
+import 'package:parasitados/screen/login/mode_game.dart';
 import 'package:parasitados/screen/questions/add_questions.dart';
-import 'package:parasitados/screen/questions/home.dart';
 import 'package:parasitados/routes/routes.dart';
-import 'package:parasitados/screen/questions/loading_game.dart';
+import 'package:parasitados/screen/questions/loading/loading_game_dois_jogador.dart';
+import 'package:parasitados/screen/questions/loading/loading_game_um_jogador.dart';
 import 'package:parasitados/screen/questions/questions_disponivel.dart';
+import 'package:parasitados/screen/questions/roleta/roleta_screen_dois_jogador.dart';
+import 'package:parasitados/screen/questions/roleta/roleta_screen_um_jogador.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:io';
-import 'screen/login/login_page.dart';
+import 'screen/login/inicio_dois_jogadores.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
@@ -44,12 +48,16 @@ class MyApp extends StatelessWidget {
 			debugShowCheckedModeBanner: false,
 			initialRoute: Routes.home,
 			routes: {
-				Routes.home:(context) => LoginPage() ,
+				Routes.home:(context) => ModeGamePage() ,
 				Routes.questoesDisponiveis: (context) => QuestionsDisponivel(),
-				Routes.questionScreen: (context) => HomePage(),
+				Routes.questionScreenUmJogador: (context) => RoletaScreenUmJogador(),
+				Routes.questionScreenDoisJogador: (context) => RoletaScreenDoisJogador(),
 				Routes.addQuestion: (context) => AddQuestionsScreen(),
 				Routes.aboutScreen: (context) => AboutPage(),
-				Routes.loadingScreen: (context) => LoadingGamePage(),
+				Routes.umJogador: (context) => InicioUmJogador(),
+				Routes.doisJogador: (context) => InicioDoisJogadores(),
+				Routes.loadingScreenUmJogador: (context) => LoadingGameUmJogador(),
+				Routes.loadingScreenDoisJogador: (context) => LoadingGameDoisJogador(),
 			},
 			builder: (context, child) {
 				Future.microtask(() async {

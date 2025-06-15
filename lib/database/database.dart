@@ -21,8 +21,8 @@ class LoginDatabase {
         await db.execute('''
           CREATE TABLE login(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome1 TEXT NOT NULL,
-            nome2 TEXT NOT NULL,
+            nome1 TEXT,
+            nome2 TEXT,
             foto1 TEXT,
             foto2 TEXT
           )

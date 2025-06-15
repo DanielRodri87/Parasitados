@@ -1,19 +1,20 @@
 import 'dart:math';
 import 'dart:io';
 import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
+import 'package:parasitados/class/mode_game/mode_game.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as path_package;
-import 'questions_screen.dart';
+import '../questions_screen.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class RoletaScreen extends StatefulWidget {
+  final TypeModeGame modeGame;
+  const RoletaScreen({super.key, required this.modeGame});
 
   @override
-  HomePageState createState() => HomePageState();
+  RoletaScreenState createState() => RoletaScreenState();
 }
 
-class HomePageState extends State<HomePage> with TickerProviderStateMixin {
+class RoletaScreenState extends State<RoletaScreen> with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
   late AnimationController _confettiController;
@@ -110,7 +111,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         winner = player1Name;
       });
       _confettiController.repeat();
-    } else if (player2Animals.length == 3) {
+    } else if (widget.modeGame == TypeModeGame.doisJogador && player2Animals.length == 3) {
       setState(() {
         gameEnded = true;
         winner = player2Name;
@@ -275,10 +276,16 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _passTheTurn() {
-    setState(() {
-      currentPlayer = currentPlayer == player1Name ? player2Name : player1Name;
-      selectedAnimal = null;
-    });
+    if (widget.modeGame == TypeModeGame.doisJogador) {
+      setState(() {
+        currentPlayer = currentPlayer == player1Name ? player2Name : player1Name;
+        selectedAnimal = null;
+      });
+    } else {
+      setState(() {
+        selectedAnimal = null;
+      });
+    }
   }
 
   void _respond() {
@@ -292,23 +299,22 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           onAnswer: (bool isCorrect) {
             setState(() {
               if (isCorrect) {
-                // Adiciona a conquista apenas se acertou
                 if (currentPlayer == player1Name) {
                   if (!player1Animals.contains(selectedAnimal!)) {
                     player1Animals.add(selectedAnimal!);
                   }
-                } else {
+                } else if (widget.modeGame == TypeModeGame.doisJogador) {
                   if (!player2Animals.contains(selectedAnimal!)) {
                     player2Animals.add(selectedAnimal!);
                   }
                 }
-                // Verifica se alguém ganhou
                 _checkForWinner();
               } else {
-                // Se errou, muda o jogador
-                currentPlayer = currentPlayer == player1Name ? player2Name : player1Name;
+                if (widget.modeGame == TypeModeGame.doisJogador) {
+                  currentPlayer = currentPlayer == player1Name ? player2Name : player1Name;
+                }
               }
-              selectedAnimal = null; // Reset para próxima rodada
+              selectedAnimal = null;
             });
           },
           player1Name: player1Name,
@@ -322,93 +328,91 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildPlayerInfo(String name, String? photo, List<String> achievedAnimals, bool isCurrentPlayer) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-        decoration: BoxDecoration(
-          gradient: isCurrentPlayer 
-            ? LinearGradient(
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+      decoration: BoxDecoration(
+        gradient: isCurrentPlayer 
+          ? LinearGradient(
 				colors: [
 				  const Color(0xFF69D1E9).withAlpha((0.2 * 255).toInt()),
 				  const Color(0xFF81DC6E).withAlpha((0.2 * 255).toInt()),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : null,
-          borderRadius: BorderRadius.circular(12),
-          border: isCurrentPlayer 
-            ? Border.all(color: const Color(0xFF69D1E9), width: 2)
-            : null,
-        ),
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.grey.shade200,
-                  backgroundImage: (photo != null && photo.isNotEmpty)
-                      ? FileImage(File(photo))
-                      : const AssetImage('assets/images/gatopreto.png') as ImageProvider,
-                ),
-                if (isCurrentPlayer)
-                  Positioned(
-                    bottom: -2,
-                    right: -2,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF69D1E9),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.play_arrow,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                    ),
-                  ),
               ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              name,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: isCurrentPlayer ? const Color(0xFF69D1E9) : Colors.black87,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            )
+          : null,
+        borderRadius: BorderRadius.circular(12),
+        border: isCurrentPlayer 
+          ? Border.all(color: const Color(0xFF69D1E9), width: 2)
+          : null,
+      ),
+      child: Column(
+        children: [
+          Stack(
+            children: [
+              CircleAvatar(
+                radius: 30,
+                backgroundColor: Colors.grey.shade200,
+                backgroundImage: (photo != null && photo.isNotEmpty)
+                    ? FileImage(File(photo))
+                    : const AssetImage('assets/images/gatopreto.png') as ImageProvider,
               ),
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: animals.map((animal) {
-                final bool isAchieved = achievedAnimals.contains(animal);
-                return Padding(
-                  padding: const EdgeInsets.only(right: 4),
+              if (isCurrentPlayer)
+                Positioned(
+                  bottom: -2,
+                  right: -2,
                   child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF69D1E9),
                       shape: BoxShape.circle,
-                      color: isAchieved 
-                        ? const Color(0xFF81DC6E).withAlpha((0.2 * 255).toInt())
-                        : Colors.grey.withAlpha((0.1 * 255).toInt()),
                     ),
-                    child: Image.asset(
-                      isAchieved ? coloredAnimalImages[animal]! : grayAnimalImages[animal]!,
-                      width: 20,
-                      height: 20,
+                    child: const Icon(
+                      Icons.play_arrow,
+                      color: Colors.white,
+                      size: 16,
                     ),
                   ),
-                );
-              }).toList(),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            name,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: isCurrentPlayer ? const Color(0xFF69D1E9) : Colors.black87,
             ),
-          ],
-        ),
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: animals.map((animal) {
+              final bool isAchieved = achievedAnimals.contains(animal);
+              return Padding(
+                padding: const EdgeInsets.only(right: 4),
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isAchieved 
+                      ? const Color(0xFF81DC6E).withAlpha((0.2 * 255).toInt())
+                      : Colors.grey.withAlpha((0.1 * 255).toInt()),
+                  ),
+                  child: Image.asset(
+                    isAchieved ? coloredAnimalImages[animal]! : grayAnimalImages[animal]!,
+                    width: 20,
+                    height: 20,
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
       ),
     );
   }
@@ -588,7 +592,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-							color: Colors.black.withAlpha((0.1 * 255).toInt()),
+                            color: Colors.black.withAlpha((0.1 * 255).toInt()),
                             blurRadius: 10,
                             offset: const Offset(0, 2),
                           ),
@@ -609,27 +613,42 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             ),
                             const SizedBox(height: 16),
                             Row(
-                              children: [
-                                _buildPlayerInfo(
-                                  player1Name, 
-                                  player1Photo, 
-                                  player1Animals, 
-                                  currentPlayer == player1Name
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: Image.asset(
-                                    'assets/images/vs.png',
-                                    height: 40,
-                                  ),
-                                ),
-                                _buildPlayerInfo(
-                                  player2Name, 
-                                  player2Photo, 
-                                  player2Animals, 
-                                  currentPlayer == player2Name
-                                ),
-                              ],
+                              children: widget.modeGame == TypeModeGame.doisJogador
+                                  ? [
+                                      Expanded(
+                                        child: _buildPlayerInfo(
+                                          player1Name,
+                                          player1Photo,
+                                          player1Animals,
+                                          currentPlayer == player1Name,
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                                        child: Image.asset(
+                                          'assets/images/vs.png',
+                                          height: 40,
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: _buildPlayerInfo(
+                                          player2Name,
+                                          player2Photo,
+                                          player2Animals,
+                                          currentPlayer == player2Name,
+                                        ),
+                                      ),
+                                    ]
+                                  : [
+                                      Expanded(
+                                        child: _buildPlayerInfo(
+                                          player1Name,
+                                          player1Photo,
+                                          player1Animals,
+                                          true,
+                                        ),
+                                      ),
+                                    ],
                             ),
                           ],
                         ),
