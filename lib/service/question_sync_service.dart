@@ -5,20 +5,14 @@ import 'package:parasitados/database/question_database.dart';
 class QuestionSyncService {
 	
 	static Future<int> addQuestionSync({
-		required Map<String, dynamic> questionData,
+		required Question questionData,
 		required Questions questions,
 		required QuestionDatabase db,
 	}) async {
 		int retorno = -1;
-		int localResult = await questions.addQuestion(questionData);
-		int redisResult = await db.addQuestion(questions, questionData);
+		int supabaseResult = await db.addQuestion(questions, questionData);
 
-		if (localResult != redisResult) {
-			await questions.delQuestion(localResult);
-			await db.delQuestion(redisResult);
-		}else{
-			retorno = redisResult;
-		}
+		retorno = supabaseResult;
 
 		return retorno;
 	}
@@ -28,9 +22,8 @@ class QuestionSyncService {
 		required Questions questions,
 		required QuestionDatabase db,
 	}) async {
-		bool localResult = await questions.delQuestion(id);
-		bool redisResult = await db.delQuestion(id);
-		return localResult && redisResult;
+		bool supabaseResult = await db.delQuestion(id);
+		return supabaseResult;
 	}
 
 	static Future<bool> updateQuestionSync({
@@ -39,8 +32,7 @@ class QuestionSyncService {
 		required Questions questions,
 		required QuestionDatabase db,
 	}) async {
-		bool localResult = await questions.updateQuestion(id, question);
-		await db.updateQuestion(id, question.toJson());
+		bool localResult = await db.updateQuestion(questions, question);
 		return localResult;
 	}
 }

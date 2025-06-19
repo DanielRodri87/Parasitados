@@ -21,15 +21,10 @@ class QuestionsSyncProvider extends ChangeNotifier {
 	Future<void> connect() async {
 		if (!_isConnected && !_isConnecting) {
 			_isConnecting = true;
-			_isConnected = await _db.connectRedis();
+			_isConnected = await _db.connect();
 			_isConnecting = false;
 			notifyListeners();
 		}
-	}
-
-	Future<void> reloadQuestionsFromJson(String jsonPath) async {
-		await _db.loadQuestionsToRedis(jsonPath);
-		notifyListeners();
 	}
 
 	Future<Map<int, dynamic>> getAllQuestions() async {
@@ -45,7 +40,7 @@ class QuestionsSyncProvider extends ChangeNotifier {
 	}
 
 	Future<int> addQuestion(
-		Map<String, dynamic> questionData,
+		Question questionData,
 	) async {
 		final result = await QuestionSyncService.addQuestionSync(
 			questionData: questionData,
@@ -81,8 +76,8 @@ class QuestionsSyncProvider extends ChangeNotifier {
 		return result;
 	}
 
-	Future<void> loadFromJson() async {
-		_questions = await Questions.fromJsonFile();
+	Future<void> loadFromCSV() async {
+		_questions = await Questions.fromCsvFile();
 		notifyListeners();
 	}
 	
@@ -91,7 +86,7 @@ class QuestionsSyncProvider extends ChangeNotifier {
 
 		Questions? loadedFromJson;
 		try {
-			loadedFromJson = await Questions.fromJsonFile();
+			loadedFromJson = await Questions.fromCsvFile();
 		} catch (_) {
 			loadedFromJson = null;
 		}

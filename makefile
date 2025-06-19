@@ -1,2 +1,3 @@
 all:
-	@docker compose up -d
+	@docker compose up --build
+	@flutter run

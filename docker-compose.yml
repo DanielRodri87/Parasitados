@@ -1,19 +1,17 @@
 services:
-  redis:
-    image: redis:latest
-    container_name: redis
+  postgres:
+    image: postgres:15
+    container_name: postgres_parasitados
+    restart: always
+    environment:
+      POSTGRES_DB: parasitados
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "6379:6379"
+      - "5432:5432"
     volumes:
-      - redis-data:/data
-
-  redisinsight:
-    image: redislabs/redisinsight:1.14.0
-    container_name: redisinsight
-    ports:
-      - "8001:8001"
-    depends_on:
-      - redis
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
   redis-data:
+  pgdata:
