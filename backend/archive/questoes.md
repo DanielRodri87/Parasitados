@@ -131,7 +131,7 @@ B) *Trypanosoma vivax*
 C) *Trypanosoma equiperdum*
 **D) *Trypanosoma evansi***
 
-**10\.** Um ponto em comum entre T. vivax e T. evansi é:
+**10\.** Um ponto em comum entre *T. vivax* e *T. evansi* é:
 A) Ambos necessitam de vetores biológicos hematófagos
 B) Ambos se multiplicam exclusivamente no intestino do vetor
 **C) Ambos podem ser transmitidos mecanicamente por moscas**
@@ -159,7 +159,7 @@ D) Mordida de inseto vetor
 A) Oocisto
 B) Cisto tecidual
 **C) Taquizoíto**
-**D) Bradizoíto**
+D) Bradizoíto
 
 **5\.** A fase crônica da infecção por *T. gondii* é caracterizada pela presença de:
 A) Oocistos esporulados
@@ -227,19 +227,19 @@ B) Ovinos
 **C) Cães**
 D) Suínos
 
-**3\.** Como ocorre a transmissão vertical da neosporose em bovinos?**
+**3\.** Como ocorre a transmissão vertical da neosporose em bovinos?
 A) Por via transcutânea no feto
 B) Pela ingestão de oocistos presentes no leite
 **C) Por via transplacentária da vaca infectada para o feto**
 D) Pelo contato com secreções nasais de cães
 
-**4\.**  A neosporose é uma causa importante de:**
+**4\.**  A neosporose é uma causa importante de:
 A) Mastite contagiosa
 **B) Abortamento em bovinos**
 C) Diarreia neonatal em suínos
 D) Enterite em equinos
 
-**5\.** Em casos de infecção congênita em cães, a infecção por *Neospora caninum* pode levar a:**
+**5\.** Em casos de infecção congênita em cães, a infecção por *Neospora caninum* pode levar a:
 A) Insuficiência renal crônica
 **B) Distúrbios neuromusculares**
 C) Pneumonia intersticial
@@ -812,7 +812,7 @@ E) vermes adultos são muito resistente as vermífugos
 **11\.** Qual característica não pertence a pequenos estrôngilos**
 
 A) estão relacionados a grande quantidade de vermes
-B) PPP é curto \- 6 a 12 semanas
+B) PPP é curto - 6 a 12 semanas
 C) As larvas penetram na parede do IG e são adultas
 **D) Realizam migração transmural**
 
@@ -1163,7 +1163,7 @@ B) Os cães desenvolvem a forma larval da doença, denominada hidatidose.
 D) Os bovinos são os principais transmissores da equinococose aos cães.
 
 **10\.** Qual das alternativas descreve uma medida correta de prevenção da cisticercose?**
-A) Congelar a carne a \-2 °C por 2 dias elimina cisticercos.
+A) Congelar a carne a -2 °C por 2 dias elimina cisticercos.
 **B) Cozinhar bem a carne e tratar adequadamente esgotos humanos.**
 C) Lavar a carne crua com vinagre antes do consumo elimina os parasitas.
 D) A cisticercose é evitada exclusivamente com a vacinação de suínos.
