@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
 	Widget build(BuildContext context) {
 		return MaterialApp(
 			debugShowCheckedModeBanner: false,
-			initialRoute: Routes.questoesDisponiveis,
+			initialRoute: Routes.home,
 			routes: {
 				Routes.home:(context) => ModeGamePage() ,
 				Routes.questoesDisponiveis: (context) => QuestionsDisponivel(),
