@@ -4,9 +4,9 @@ services:
     container_name: postgres_parasitados
     restart: always
     environment:
-      POSTGRES_DB: parasitados
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRESS_DATABASE}
+      POSTGRES_USER: ${POSTGRESS_USER}
+      POSTGRES_PASSWORD: ${POSTGRESS_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
