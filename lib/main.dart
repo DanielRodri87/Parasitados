@@ -11,17 +11,18 @@ import 'package:parasitados/screen/questions/questions_disponivel.dart';
 import 'package:parasitados/screen/questions/roleta/roleta_screen_dois_jogador.dart';
 import 'package:parasitados/screen/questions/roleta/roleta_screen_um_jogador.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:io';
 import 'screen/login/inicio_dois_jogadores.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 Future<void> main() async {
-  	// Garante que o Flutter está inicializado
 	await dotenv.load(fileName: ".env");
 	
-	WidgetsFlutterBinding.ensureInitialized();
-
+	WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+	FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 	// Inicializa o sqflite para desktop
 	if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
 		// Define o caminho para a biblioteca SQLite
@@ -29,6 +30,14 @@ Future<void> main() async {
 		databaseFactory = databaseFactoryFfi;
 	}
 
+	// Aguarda o audio tocar e entra no app
+	FlutterNativeSplash.remove();
+
+	await Supabase.initialize(    
+		url: dotenv.env['PUBLIC_SUPABASE_URL'] ?? '',    
+		anonKey: dotenv.env['PUBLIC_SUPABASE_ANON_KEY'] ?? '',  
+	);
+	
 	runApp(
 		MultiProvider(
 			providers: [

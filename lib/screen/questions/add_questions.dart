@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parasitados/class/questions/question.dart';
 import 'package:parasitados/partials/add_questions/option_tile.dart';
 import 'package:parasitados/provider/questions_sync_provider.dart';
 import 'package:provider/provider.dart';
@@ -41,16 +42,13 @@ class _AddQuestionsScreenState extends State<AddQuestionsScreen> {
 			);
 			return;
 		}
-		Map<String,dynamic> dados = {
-			'pergunta': enunciado,
-			'resposta': String.fromCharCode(96 + selectedOption!), // 1->a, 2->b, etc
-			'alternativas': [
-				{"a": opcaoA},
-				{"b": opcaoB},
-				{"c": opcaoC},
-				{"d": opcaoD},
-			]
-		};
+		
+		Question dados = Question(
+			enunciado: enunciado, 
+			topico: "teste", 
+			opcoes: ["1","2","3","4",], 
+			respostaCorreta: 1
+		);
 
 		int retorno = await Provider.of<QuestionsSyncProvider>(context,listen: false).addQuestion(
 			dados,
