@@ -553,15 +553,12 @@ class _QuestionScreenState extends State<QuestionScreen>
                           itemCount: currentQuestion!.opcoes.length,
                           itemBuilder: (context, index) {
                             final op = currentQuestion!.opcoes[index];
-                            String texto;
+                            
+							String texto;
                             String letra;
-                            if (op is Map && op.isNotEmpty) {
-                              letra = op.keys.first.toUpperCase();
-                              texto = op.values.first.toString();
-                            } else {
-                              letra = String.fromCharCode(65 + index);
-                              texto = op.toString();
-                            }
+
+							letra = Question.parseRespostaString(index);
+							texto = op;
                             return _buildAnswerOption(texto, index + 1, letra);
                           },
                         ),
