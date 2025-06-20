@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class Question {
 	final int? id;
 	final String enunciado;

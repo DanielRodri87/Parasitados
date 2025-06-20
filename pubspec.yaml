@@ -35,6 +35,31 @@ dependencies:
   path: ^1.8.3
   image_picker: ^1.0.0
   flutter_dotenv: ^5.2.1
+  flutter_launcher_icons: "^0.14.4"
+  postgres: ^3.5.6
+  provider: ^6.1.5
+  supabase_flutter: ^2.9.1
+  csv: ^5.0.0
+  flutter_native_splash: ^2.4.6
+
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/LogoAplicativo.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+    image_path: "assets/images/LogoAplicativo.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "assets/images/LogoAplicativo.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
+    image_path: "assets/images/LogoAplicativo.png"
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
