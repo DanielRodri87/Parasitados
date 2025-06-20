@@ -1375,7 +1375,7 @@ d) No fígado dos bovinos
 **7\.** Uma diferença entre *C. hominivorax* e *D. hominis* é que:
 a) Ambas causam o mesmo tipo de lesão.
 b) *C. hominivorax* é endêmica apenas no Norte do Brasil.
-**c) *C. hominivorax* infesta feridas; *D. hominis* penetra pele íntegra.**
+**c) *C. hominivorax* infesta feridas.
 d) *D. hominis* é uma mosca hematófaga.
 
 **8\.** A *Musca domestica* pode estar envolvida em casos de miíase:
