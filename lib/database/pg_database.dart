@@ -4,7 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'postgres_local_helper.dart';
 
 class PgDatabase {
-	bool usePostgresLocal = true;
+	bool usePostgresLocal = false;
 	SupabaseClient? supabase;
 	PostgresLocalHelper? pgHelper;
 
