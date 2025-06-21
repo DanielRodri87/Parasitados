@@ -21,9 +21,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
-Future<void> main() async { 
+Future<void> main() async {
 	await dotenv.load(fileName: ".env");
-	
+
 	WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 	FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
@@ -37,11 +37,11 @@ Future<void> main() async {
 	// Aguarda o audio tocar e entra no app
 	FlutterNativeSplash.remove();
 
-	await Supabase.initialize(    
-		url: dotenv.env['PUBLIC_SUPABASE_URL'] ?? '',    
-		anonKey: dotenv.env['PUBLIC_SUPABASE_ANON_KEY'] ?? '',  
+	await Supabase.initialize(
+		url: dotenv.env['PUBLIC_SUPABASE_URL'] ?? '',
+		anonKey: dotenv.env['PUBLIC_SUPABASE_ANON_KEY'] ?? '',
 	);
-	
+
 	runApp(
 		MultiProvider(
 			providers: [
@@ -49,7 +49,7 @@ Future<void> main() async {
 				ChangeNotifierProvider(create: (_) => RankingProvider()),
 			],
 			child: MyApp(),
-		)
+		),
 	);
 }
 
@@ -60,10 +60,10 @@ class MyApp extends StatelessWidget {
 	Widget build(BuildContext context) {
 		return MaterialApp(
 			debugShowCheckedModeBanner: false,
-			initialRoute: Routes.home,
+			initialRoute: Routes.splashScreen,
 			routes: {
-				Routes.home:(context) => ModeGamePage() ,
-				Routes.splashScreen:(context) => SplashScreen() ,
+				Routes.home: (context) => ModeGamePage(),
+				Routes.splashScreen: (context) => SplashScreen(),
 				Routes.questoesDisponiveis: (context) => QuestionsDisponivel(),
 				Routes.questionScreenUmJogador: (context) => RoletaScreenUmJogador(),
 				Routes.questionScreenDoisJogador: (context) => RoletaScreenDoisJogador(),
@@ -78,9 +78,15 @@ class MyApp extends StatelessWidget {
 			builder: (context, child) {
 				Future.microtask(() async {
 					if (context.mounted) {
-						await Provider.of<QuestionsSyncProvider>(context, listen: false).connect();
+						await Provider.of<QuestionsSyncProvider>(
+							context,
+							listen: false,
+						).connect();
 						if (context.mounted) {
-							await Provider.of<QuestionsSyncProvider>(context, listen: false).syncAllQuestionsDatabaseToLocal(context);
+							await Provider.of<QuestionsSyncProvider>(
+								context,
+								listen: false,
+							).syncAllQuestionsDatabaseToLocal(context);
 						}
 					}
 				});
