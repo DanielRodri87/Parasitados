@@ -1,5 +1,6 @@
 class Routes {
 	static String home = '/';
+	static String splashScreen = '/splashScreen';
 	static String questoesDisponiveis = '/questoesDisponiveis';
   	static String questionScreen = '/questionScreen';
 	static String addQuestion = '/addQuestion';
@@ -10,4 +11,5 @@ class Routes {
 	static String loadingScreenDoisJogador = '/loadingScreenDoisJogador';
 	static String questionScreenUmJogador = '/questionScreenUmJogador';
 	static String questionScreenDoisJogador = '/questionScreenDoisJogador';
+	static String rankingScreen = '/rankingScreen';
 }

@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:parasitados/database/database.dart';
+import 'package:parasitados/database/user_database.dart';
 import 'package:parasitados/routes/routes.dart';
 import 'package:parasitados/screen/login/balloon_painter.dart';
 import 'package:sqflite/sqflite.dart';
-import '../../database/database.dart';
 
 class InicioUmJogador extends StatelessWidget {
   const InicioUmJogador({super.key});
@@ -69,30 +70,50 @@ class LoginFormContainer extends StatefulWidget {
 }
 
 class _LoginFormContainerState extends State<LoginFormContainer> {
-  String nome1 = '';
-  String foto1 = '';
+	String nome1 = '';
+	String foto1 = '';
+	String? nomeFinal;
 
-  Future<void> salvarNoBanco() async {
-    if (nome1.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, preencha os nomes dos jogadores')),
-      );
-      return;
-    }
+	Future<void> lerDados() async {
+		final dados = await UserDatabase.lerUserLocal();
+		if (dados != null && dados["nome"] != null) {
+			setState(() {
+				nomeFinal = dados["nome"];
+			});
+   		}
+	}
 
-    final db = await LoginDatabase().database;
+  	Future<void> salvarNoBanco() async {
+		if (nome1.isEmpty && nomeFinal == null) {
+			ScaffoldMessenger.of(context).showSnackBar(
+				const SnackBar(content: Text('Por favor, preencha os nomes dos jogadores')),
+			);
+			return;
+		}
 
-    await db.insert(
-      'login',
-      {
-        'id': 1, // Sempre sobrescrevendo este registro
-        'nome1': nome1,
-		'nome2':'fake',
-        'foto1': foto1.isNotEmpty ? foto1 : null,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
+		final db = await LoginDatabase().database;
+
+		final userDb = UserDatabase.withData();
+		final int id = await userDb.addUser(nome1);
+		await UserDatabase.salvarUserLocal(nome1, id);
+
+		await db.insert(
+			'login',
+			{
+				'id': 1, // Sempre sobrescrevendo este registro
+				'nome1': nome1,
+				'nome2':'fake',
+				'foto1': foto1.isNotEmpty ? foto1 : null,
+			},
+			conflictAlgorithm: ConflictAlgorithm.replace,
+		);
+  	}
+	
+	@override
+	void initState() {
+		super.initState();
+		lerDados();
+	}
 
   @override
   Widget build(BuildContext context) {
@@ -186,42 +207,56 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
 				    ],
 				  ),
 				  SizedBox(height: 10,),
-                  CustomInputField(
-                    hintText: 'Digite o jogador 1 aqui',
-                    onNameChanged: (value) => setState(() => nome1 = value),
-                    onImageSelected: (path) => setState(() => foto1 = path),
-                  ),
-                  const SizedBox(height: 20),
-				  ElevatedButton(
-					onPressed: (nome1.isNotEmpty)
-						? () async {
-						try {
-							await salvarNoBanco();
-							if (!context.mounted) return;
-							Navigator.pushNamed(context, Routes.loadingScreenUmJogador);
-						} catch (e) {
-							if (!context.mounted) return;
-							ScaffoldMessenger.of(context).showSnackBar(
-								SnackBar(content: Text('Erro ao salvar os dados: $e')),
-							);
-						}
+                  if (nomeFinal != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Text(
+                        'Bem-vindo de volta, $nomeFinal!',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                    ),
+
+					CustomInputField(
+						hintText: 'Digite o jogador 1 aqui',
+						onNameChanged: (v) => setState(() => nome1 = v),
+						onImageSelected: (p) => setState(() => foto1 = p),
+						enabled: nomeFinal == null,
+					),
+					const SizedBox(height: 20),
+					ElevatedButton(
+						onPressed: (nome1.isNotEmpty || nomeFinal != null)
+							? () async {
+							try {
+								await salvarNoBanco();
+								if (!context.mounted) return;
+								Navigator.pushNamed(context, Routes.loadingScreenUmJogador);
+							} catch (e) {
+								if (!context.mounted) return;
+								ScaffoldMessenger.of(context).showSnackBar(
+									SnackBar(content: Text('Erro ao salvar os dados: $e')),
+								);
+							}
 						}
 						: null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00DB8F),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
-                    ),
-                    child: const Text(
-                      'Entrar',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+						style: ElevatedButton.styleFrom(
+							backgroundColor: const Color(0xFF00DB8F),
+							shape: RoundedRectangleBorder(
+								borderRadius: BorderRadius.circular(30),
+							),
+							padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
+							),
+							child: const Text(
+								'Entrar',
+							style: TextStyle(
+								fontSize: 18,
+								color: Colors.white,
+							),
+						),
+					),
                   const SizedBox(height: 20),
                 ],
               ),
@@ -235,6 +270,7 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
 
 class CustomInputField extends StatefulWidget {
   final String hintText;
+  final bool enabled;
   final Function(String)? onNameChanged;
   final Function(String)? onImageSelected;
 
@@ -243,6 +279,7 @@ class CustomInputField extends StatefulWidget {
     required this.hintText,
     this.onNameChanged,
     this.onImageSelected,
+    required this.enabled,
   });
 
   @override
@@ -270,6 +307,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+		enabled: widget.enabled,
       onChanged: widget.onNameChanged,
       decoration: InputDecoration(
         hintText: widget.hintText,

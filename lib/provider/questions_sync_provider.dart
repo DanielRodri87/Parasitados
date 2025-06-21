@@ -84,23 +84,14 @@ class QuestionsSyncProvider extends ChangeNotifier {
 	Future<void> syncAllQuestionsDatabaseToLocal(BuildContext context) async {
 		if (_hasSynced) return;
 
-		Questions? loadedFromJson;
-		try {
-			loadedFromJson = await Questions.fromCsvFile();
-		} catch (_) {
-			loadedFromJson = null;
-		}
+		Questions? loadedFromCsv;
 
-		if (loadedFromJson != null && loadedFromJson.questoes.isNotEmpty) {
-			_questions = loadedFromJson;
-			_questions.quantQuestion;
+		_questions = (await syncToLocal())!;
+		_questions.quantQuestion;
+
+		if (_db.pgDatabase!.usePostgresLocal) {
 			debugPrint('Carregado do json ${_questions.quantQuestion}');
 		} else {
-			if(!context.mounted) return;
-			final syncedQuestions = await syncToLocal();
-			if (syncedQuestions != null) {
-				_questions = syncedQuestions;
-			}
 			debugPrint('Carregado do banco ${_questions.quantQuestion}');
 		}
 
