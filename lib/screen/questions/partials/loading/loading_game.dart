@@ -4,6 +4,7 @@ import 'dart:math' show Random;
 import 'package:flutter/material.dart';
 import 'package:parasitados/class/mode_game/mode_game.dart';
 import 'package:parasitados/database/database.dart';
+import 'package:parasitados/database/user_database.dart';
 import 'package:parasitados/routes/routes.dart';
 
 class LoadingGamePage extends StatefulWidget {
@@ -212,13 +213,18 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
     try {
       final db = await LoginDatabase().database;
       final resultado = await db.query('login', limit: 1);
+      final dadosShared = await UserDatabase.lerUserLocal();
 
       if (!mounted) return;
 
       if (resultado.isNotEmpty) {
         final dados = resultado.first;
         setState(() {
-          nome1 = dados['nome1'] as String? ?? 'Jogador 1';
+		  nome1 = (dados['nome1'] != null && (dados['nome1'] as String).isNotEmpty)
+			  ? dados['nome1']
+			  : (dadosShared?['nome'] != null && (dadosShared?['nome'] as String).isNotEmpty)
+				  ? dadosShared!['nome']
+				  : 'Jogador 1';
           nome2 = dados['nome2'] as String? ?? 'Jogador 2';
           foto1 = dados['foto1'] as String?;
           foto2 = dados['foto2'] as String?;

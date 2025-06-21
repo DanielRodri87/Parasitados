@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:parasitados/class/mode_game/mode_game.dart';
-import 'package:parasitados/screen/questions/loading/loading_game.dart';
+import 'package:parasitados/screen/questions/partials/loading/loading_game.dart';
 
 class LoadingGameUmJogador extends StatelessWidget {
   const LoadingGameUmJogador({super.key});
