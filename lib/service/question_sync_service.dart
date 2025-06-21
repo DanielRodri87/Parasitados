@@ -3,7 +3,6 @@ import 'package:parasitados/class/questions/question.dart';
 import 'package:parasitados/database/question_database.dart';
 
 class QuestionSyncService {
-	
 	static Future<int> addQuestionSync({
 		required Question questionData,
 		required Questions questions,
