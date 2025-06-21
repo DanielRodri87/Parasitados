@@ -41,6 +41,7 @@ dependencies:
   supabase_flutter: ^2.9.1
   csv: ^5.0.0
   flutter_native_splash: ^2.4.6
+  url_launcher: ^6.0.0
 
 
 flutter_launcher_icons:
