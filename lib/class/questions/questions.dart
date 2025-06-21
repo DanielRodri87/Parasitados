@@ -51,4 +51,10 @@ class Questions {
 		return questoes[id];
 	}
 
+	List<Question> questoesTopico(String topico) {
+		return questoes.values
+			.where((q) => q.topico == topico)
+			.toList();
+	}
+
 }

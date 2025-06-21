@@ -1,8 +1,8 @@
 import re
 import csv
 
-input_md = 'archive/questoes.md'
-output_csv = 'archive/questoes_md_formatadas.csv'
+input_md = 'backend/archive/questoes.md'
+output_csv = 'assets/pdf/questoes_md_formatadas.csv'
 
 with open(input_md, encoding='utf-8') as f:
     lines = f.readlines()
@@ -85,7 +85,7 @@ for idx, line in enumerate(lines):
     m_alt = padrao_alternativa.match(line)
     if m_alt:
         letra = m_alt.group(2).upper()
-        texto = m_alt.group(3).strip('*').strip()
+        texto = m_alt.group(3).strip().replace('**','')
         texto = texto[:1].upper() + texto[1:]
         
         if line.startswith('**'):

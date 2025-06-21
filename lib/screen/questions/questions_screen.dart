@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:parasitados/class/questions/question.dart';
+import 'package:parasitados/class/text_questions/text_questions.dart';
 import 'dart:io';
 import 'package:parasitados/provider/questions_sync_provider.dart';
 import 'package:provider/provider.dart';
@@ -14,16 +15,16 @@ class QuestionScreen extends StatefulWidget {
   final String? player2Photo;
   final String currentPlayer;
 
-  const QuestionScreen({
-    super.key, 
-    required this.animal,
-    required this.onAnswer,
-    required this.player1Name,
-    required this.player2Name,
-    required this.player1Photo,
-    required this.player2Photo,
-    required this.currentPlayer,
-  });
+	const QuestionScreen({
+			super.key, 
+			required this.animal,
+			required this.onAnswer,
+			required this.player1Name,
+			required this.player2Name,
+			required this.player1Photo,
+			required this.player2Photo,
+			required this.currentPlayer,
+	});
 
   @override
   State<QuestionScreen> createState() => _QuestionScreenState();
@@ -40,6 +41,12 @@ class _QuestionScreenState extends State<QuestionScreen>
   late AnimationController _scaleController;
   late Animation<double> _pulseAnimation;
   late Animation<double> _scaleAnimation;
+  
+  final Map<String, String> animalNames = {
+    'barata': 'ECTOPARASITAS',
+    'minhoca': 'HELMINTOS',
+    'azul': 'PROTOZOÁRIOS',
+  };
 
   @override
   void initState() {
@@ -87,7 +94,7 @@ class _QuestionScreenState extends State<QuestionScreen>
     // Carrega todas as questões do JSON
     final questions = Provider.of<QuestionsSyncProvider>(context,listen: false).questions;
 
-    final questoesList = questions.questoes.values.toList();
+    final questoesList = questions.questoesTopico(animalNames[widget.animal]!);
     if (questoesList.isNotEmpty) {
       	final random = Random();
 		final q = questoesList[random.nextInt(questoesList.length)];
@@ -112,101 +119,101 @@ class _QuestionScreenState extends State<QuestionScreen>
     
     // Só procede se o dialog não foi descartado
     if (shouldProceed) {
-      widget.onAnswer(isAnswerCorrect!);
-      if (mounted) {
-        Navigator.pop(context);
-      }
-    }
+		widget.onAnswer(isAnswerCorrect!);
+		if (mounted) {
+			Navigator.pop(context);
+		}
+	}
   }
 
   Future<bool> _showFeedbackDialog() async {
     return await showDialog<bool>(
-      context: context,
-      barrierDismissible: false, // Previne fechar ao clicar fora
-      builder: (BuildContext context) {
-        return PopScope( // Previne o botão de voltar
-          canPop: false,
-          child: ScaleTransition(
-            scale: _scaleAnimation,
-            child: AlertDialog(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              // Remove the default close button by not setting actions
-              content: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isAnswerCorrect!
-                    ? [Colors.green.shade300, Colors.green.shade500]
-                    : [Colors.red.shade300, Colors.red.shade500],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha((0.2 * 255).toInt()),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      isAnswerCorrect! ? Icons.check_circle : Icons.cancel,
-                      size: 80,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      isAnswerCorrect! ? 'Parabéns!' : 'Ops!',
-                      style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      isAnswerCorrect! 
-                      ? 'Resposta correta! 🎉'
-                      : 'Resposta incorreta! 😢',
-                      style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: isAnswerCorrect! ? Colors.green : Colors.red,
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                      ),
-                      child: const Text(
-                    'Continuar',
-                 style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    ) ?? false;
-  }
+		context: context,
+		barrierDismissible: false, // Previne fechar ao clicar fora
+		builder: (BuildContext context) {
+			return PopScope( // Previne o botão de voltar
+				canPop: false,
+				child: ScaleTransition(
+					scale: _scaleAnimation,
+					child: AlertDialog(
+					backgroundColor: Colors.transparent,
+					elevation: 0,
+					// Remove the default close button by not setting actions
+					content: Container(
+						padding: const EdgeInsets.all(24),
+						decoration: BoxDecoration(
+						gradient: LinearGradient(
+							colors: isAnswerCorrect!
+							? [Colors.green.shade300, Colors.green.shade500]
+							: [Colors.red.shade300, Colors.red.shade500],
+							begin: Alignment.topLeft,
+							end: Alignment.bottomRight,
+						),
+						borderRadius: BorderRadius.circular(20),
+						boxShadow: [
+							BoxShadow(
+							color: Colors.black.withAlpha((0.2 * 255).toInt()),
+							blurRadius: 20,
+							offset: const Offset(0, 10),
+							),
+						],
+						),
+						child: Column(
+						mainAxisSize: MainAxisSize.min,
+						children: [
+							Icon(
+							isAnswerCorrect! ? Icons.check_circle : Icons.cancel,
+							size: 80,
+							color: Colors.white,
+							),
+							const SizedBox(height: 16),
+							Text(
+							isAnswerCorrect! ? 'Parabéns!' : 'Ops!',
+							style: const TextStyle(
+							fontSize: 28,
+							fontWeight: FontWeight.bold,
+							color: Colors.white,
+							),
+							),
+							const SizedBox(height: 8),
+							Text(
+							isAnswerCorrect! 
+							? 'Resposta correta! 🎉'
+							: 'Resposta incorreta! 😢',
+							style: const TextStyle(
+							fontSize: 18,
+							color: Colors.white,
+							),
+							textAlign: TextAlign.center,
+							),
+							const SizedBox(height: 24),
+							ElevatedButton(
+								onPressed: () => Navigator.of(context).pop(true),
+								style: ElevatedButton.styleFrom(
+									backgroundColor: Colors.white,
+									foregroundColor: isAnswerCorrect! ? Colors.green : Colors.red,
+									padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+									shape: RoundedRectangleBorder(
+										borderRadius: BorderRadius.circular(25),
+									),
+								),
+								child: const Text(
+									'Continuar',
+									style: TextStyle(
+										fontSize: 16,
+										fontWeight: FontWeight.bold,
+									),
+								),
+							),
+						],
+						),
+					),
+					),
+				),
+			);
+		},
+		) ?? false;
+	}
 
   Widget _buildCurrentPlayerHeader() {
     // Identifica qual jogador está jogando
@@ -386,15 +393,24 @@ class _QuestionScreenState extends State<QuestionScreen>
             borderRadius: BorderRadius.circular(20),
           ),
           child: SingleChildScrollView(
-            child: Text(
-              currentQuestion!.enunciado,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-                height: 1.4,
+            child: RichText(
+              text: TextSpan(
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                  height: 1.4,
+                ),
+                children: TextQuestions.parseItalics(
+                  currentQuestion!.enunciado,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                    height: 1.4,
+                  ),
+                ),
               ),
-              textAlign: TextAlign.center,
             ),
           ),
         ),
@@ -467,12 +483,21 @@ class _QuestionScreenState extends State<QuestionScreen>
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: textColor,
-                      fontWeight: FontWeight.w500,
+                  child: RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: textColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      children: TextQuestions.parseItalics(
+                        text,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: textColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ),
                   ),
                 ),
