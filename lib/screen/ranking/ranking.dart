@@ -44,45 +44,82 @@ class RankingScreen extends StatelessWidget {
 								children: [
 									const SizedBox(height: 16),
 									Padding(
-										padding: EdgeInsetsGeometry.only(left: 10,right: 10),
-									child: Row(
-									mainAxisAlignment: MainAxisAlignment.spaceBetween,
-									crossAxisAlignment: CrossAxisAlignment.center,
-									children: [
-										Row(
+										padding: const EdgeInsets.symmetric(horizontal: 10),
+										child: Row(
 											crossAxisAlignment: CrossAxisAlignment.center,
+											spacing: 8,
 											children: [
 												IconButton(
-													onPressed: (){
-														Navigator.pushReplacementNamed(context,Routes.home);
-													}, 
-													icon: Icon(
+													onPressed: () {
+														Navigator.pushReplacementNamed(context, Routes.home);
+													},
+													icon: const Icon(
 														Icons.arrow_back_outlined,
 														color: Colors.white,
-													)
+													),
 												),
-												Text(
-													'Parasitados',
-													style: TextStyle(
-													fontSize: 20,
-													fontWeight: FontWeight.bold,
-													color: Colors.white,
-													fontFamily: 'Georgia',
+												Expanded(
+													child: LayoutBuilder(
+														builder: (context, constraints) {
+															// Defina o breakpoint desejado, por exemplo 320
+															if (constraints.maxWidth < 320) {
+																return Column(
+																	crossAxisAlignment: CrossAxisAlignment.start,
+																	children: const [
+																		Text(
+																			'Parasitados',
+																			style: TextStyle(
+																				fontSize: 16,
+																				fontWeight: FontWeight.bold,
+																				color: Colors.white,
+																				fontFamily: 'Georgia',
+																			),
+																			overflow: TextOverflow.ellipsis,
+																		),
+																		Text(
+																			'Descubra seus dons conosco!',
+																			style: TextStyle(
+																				fontSize: 14,
+																				color: Colors.white,
+																				fontFamily: 'Georgia',
+																			),
+																			overflow: TextOverflow.ellipsis,
+																		),
+																	],
+																);
+															} else {
+																return Row(
+																	crossAxisAlignment: CrossAxisAlignment.center,
+																	mainAxisAlignment: MainAxisAlignment.spaceBetween,
+																	spacing: 8,
+																	children: const [
+																		Text(
+																			'Parasitados',
+																			style: TextStyle(
+																				fontSize: 16,
+																				fontWeight: FontWeight.bold,
+																				color: Colors.white,
+																				fontFamily: 'Georgia',
+																			),
+																			overflow: TextOverflow.ellipsis,
+																		),
+																		Text(
+																			'Descubra seus dons conosco!',
+																			style: TextStyle(
+																				fontSize: 14,
+																				color: Colors.white,
+																				fontFamily: 'Georgia',
+																			),
+																			overflow: TextOverflow.ellipsis,
+																		),
+																	],
+																);
+															}
+														},
 													),
 												),
 											],
-										),
-										Text(
-											'Descubra seus dons conosco!',
-											style: TextStyle(
-												fontSize: 14,
-												color: Colors.white,
-												fontFamily: 'Georgia',
-											),
-											textAlign: TextAlign.center,
-										),
-									],
-																),
+									),
 								),
 								const SizedBox(height: 16),
 								// Pulga
@@ -167,9 +204,9 @@ class RankingScreen extends StatelessWidget {
 							),
 							),
 						],
-						),
+					),
 				);
-          }
+          	}
         );
       }
     );

@@ -255,25 +255,38 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
   }
 
   Widget playerCard(String nome, String? foto) {
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 60,
-          backgroundColor: Colors.grey.shade200,
-          backgroundImage: (foto != null && foto.isNotEmpty)
-              ? FileImage(File(foto)) // Use FileImage para caminhos de arquivo
-              : const AssetImage('assets/images/gatopreto.png') as ImageProvider,
-        ),
-        const SizedBox(height: 16),
-        Text(
-          nome,
-          style: const TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
-    );
+	
+	return LayoutBuilder(
+	  builder: (context, constraints) {
+		// Define o raio do avatar proporcional à largura disponível, com limites mínimo/máximo
+		double avatarRadius = (constraints.maxWidth / 4).clamp(50.0, 60.0);
+		return Column(
+		  mainAxisSize: MainAxisSize.min,
+		  children: [
+			CircleAvatar(
+			  radius: avatarRadius,
+			  backgroundColor: Colors.grey.shade200,
+			  backgroundImage: (foto != null && foto.isNotEmpty)
+				  ? FileImage(File(foto))
+				  : const AssetImage('assets/images/gatopreto.png') as ImageProvider,
+			),
+			const SizedBox(height: 16),
+			FittedBox(
+			  fit: BoxFit.scaleDown,
+			  child: Text(
+				nome,
+				style: const TextStyle(
+				  fontSize: 26,
+				  fontWeight: FontWeight.w600,
+				),
+				maxLines: 1,
+				overflow: TextOverflow.ellipsis,
+			  ),
+			),
+		  ],
+		);
+	  },
+	);
   }
 
   @override
@@ -292,17 +305,17 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
 			mainAxisAlignment: MainAxisAlignment.spaceBetween,
 			children: [
 				if (widget.tipoModeGame == TypeModeGame.doisJogador)
-					Row(
-						mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-						children: [
-							playerCard(nome1, foto1),
-							Image.asset(
-								'assets/images/fite.png',
-								width: 90,
-							),
-							playerCard(nome2, foto2),
-						],
-					)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(child: playerCard(nome1, foto1)),
+              Image.asset(
+                'assets/images/fite.png',
+                width: 90,
+              ),
+              Expanded(child: playerCard(nome2, foto2)),
+            ],
+          )
 				else
 					Column(
 						mainAxisAlignment: MainAxisAlignment.center,

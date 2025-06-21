@@ -466,27 +466,25 @@ class RoletaScreenState extends State<RoletaScreen> with TickerProviderStateMixi
 				maxLines: 1,
 			),
 			const SizedBox(height: 8),
-			Row(
-				mainAxisAlignment: MainAxisAlignment.center,
+			Wrap(
+				alignment: WrapAlignment.center,
+				spacing: 4,
 				children: animals.map((animal) {
-				final bool isAchieved = achievedAnimals.contains(animal);
-				return Padding(
-					padding: const EdgeInsets.only(right: 4),
-					child: Container(
-					padding: const EdgeInsets.all(2),
-					decoration: BoxDecoration(
-						shape: BoxShape.circle,
-						color: isAchieved 
-						? const Color(0xFF81DC6E).withAlpha((0.2 * 255).toInt())
-						: Colors.grey.withAlpha((0.1 * 255).toInt()),
-					),
-					child: Image.asset(
+					final bool isAchieved = achievedAnimals.contains(animal);
+					return Container(
+						padding: const EdgeInsets.all(2),
+						decoration: BoxDecoration(
+							shape: BoxShape.circle,
+							color: isAchieved 
+								? const Color(0xFF81DC6E).withAlpha((0.2 * 255).toInt())
+								: Colors.grey.withAlpha((0.1 * 255).toInt()),
+						),
+						child: Image.asset(
 							isAchieved ? coloredAnimalImages[animal]! : grayAnimalImages[animal]!,
-						width: 20,
-						height: 20,
-					),
-					),
-				);
+							width: 20,
+							height: 20,
+						),
+					);
 				}).toList(),
 			),
 			],

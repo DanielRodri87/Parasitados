@@ -20,13 +20,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
 	void _startLoading() async {
 		for (int i = 1; i <= 100; i++) {
-		await Future.delayed(const Duration(milliseconds: 25));
+			await Future.delayed(const Duration(milliseconds: 25));
 			setState(() {
 				progress = i / 100;
 			});
 		}
 
-		if(mounted) Navigator.pushReplacementNamed(context, Routes.home);
+		if (mounted) {
+			Navigator.pushReplacementNamed(context,Routes.home);
+		}
 	}
 
 	@override
