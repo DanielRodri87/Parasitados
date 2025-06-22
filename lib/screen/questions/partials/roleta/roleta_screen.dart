@@ -45,7 +45,7 @@ class RoletaScreenState extends State<RoletaScreen> with TickerProviderStateMixi
   int qtdRespondida = 0;
 
   final List<String> animals = ['barata', 'minhoca', 'azul'];
-  final List<String> wheelOptions = ['minhoca', 'azul', 'barata', 'passar_vez'];
+  late List<String> wheelOptions;
   double finalRotation = 0;
   
   // Map for gray (unachieved) images
@@ -69,9 +69,26 @@ class RoletaScreenState extends State<RoletaScreen> with TickerProviderStateMixi
     'azul': 'Protozoários',
   };
 
+  // Add counters for each animal type for both players
+  Map<String, Map<String, int>> playerAnimalCorrectAnswers = {
+    'player1': {
+      'barata': 0,
+      'minhoca': 0,
+      'azul': 0,
+    },
+    'player2': {
+      'barata': 0,
+      'minhoca': 0,
+      'azul': 0,
+    }
+  };
+
   @override
   void initState() {
     super.initState();
+    wheelOptions = widget.modeGame == TypeModeGame.doisJogador 
+        ? ['minhoca', 'azul', 'barata', 'passar_vez']
+        : ['minhoca', 'azul', 'barata'];
     _loadPlayers();
     _controller = AnimationController(
       duration: const Duration(seconds: 3),
@@ -194,7 +211,7 @@ class RoletaScreenState extends State<RoletaScreen> with TickerProviderStateMixi
 		_controller.forward(from: 0).whenComplete(() {
 			// Calcula onde a seta está apontando (4 seções de 90 graus cada)
 			final normalizedRotation = (totalRotation * 2 * pi) % (2 * pi);
-			final sectionAngle = (2 * pi) / 4; // 4 opções na roleta
+			final sectionAngle = (2 * pi) / wheelOptions.length; // Use wheelOptions.length instead of fixed 4
 			
 			// A seta aponta para baixo, então ajustamos para começar do topo
 			final adjustedAngle = (normalizedRotation + (pi / 2)) % (2 * pi);
@@ -350,12 +367,19 @@ class RoletaScreenState extends State<RoletaScreen> with TickerProviderStateMixi
 					setState(() {
 						if (isCorrect) {
 							if (widget.modeGame == TypeModeGame.doisJogador) {
-								if (currentPlayer == player1Name) {
-									if (!player1Animals.contains(selectedAnimal!)) {
-									player1Animals.add(selectedAnimal!);
-									}
-								} else {
-									if (!player2Animals.contains(selectedAnimal!)) {
+								String currentPlayerKey = currentPlayer == player1Name ? 'player1' : 'player2';
+								List<String> currentPlayerAnimals = currentPlayer == player1Name ? player1Animals : player2Animals;
+
+								// Increment counter for current player and animal
+								playerAnimalCorrectAnswers[currentPlayerKey]![selectedAnimal!] = 
+									(playerAnimalCorrectAnswers[currentPlayerKey]![selectedAnimal!] ?? 0) + 1;
+								
+								// Add achievement only after 3 correct answers
+								if (playerAnimalCorrectAnswers[currentPlayerKey]![selectedAnimal!]! >= 3 && 
+									!currentPlayerAnimals.contains(selectedAnimal!)) {
+									if (currentPlayer == player1Name) {
+										player1Animals.add(selectedAnimal!);
+									} else {
 										player2Animals.add(selectedAnimal!);
 									}
 								}
@@ -370,9 +394,14 @@ class RoletaScreenState extends State<RoletaScreen> with TickerProviderStateMixi
 								if (player1Animals.contains(selectedAnimal!)) {
 									qtdIncorreta++;
 									player1Animals.remove(selectedAnimal!);
+									// Reset counter for this animal when losing achievement
+									playerAnimalCorrectAnswers['player1']![selectedAnimal!] = 0;
 								}
 								_checkForLooser();
-							}else{
+							} else {
+								String currentPlayerKey = currentPlayer == player1Name ? 'player1' : 'player2';
+								// Reset counter on wrong answer in two player mode
+								playerAnimalCorrectAnswers[currentPlayerKey]![selectedAnimal!] = 0;
 								currentPlayer = currentPlayer == player1Name ? player2Name : player1Name;
 							}
 						}
