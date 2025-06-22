@@ -69,6 +69,20 @@ class RoletaScreenState extends State<RoletaScreen> with TickerProviderStateMixi
     'azul': 'Protozoários',
   };
 
+  // Add counters for each animal type for both players
+  Map<String, Map<String, int>> playerAnimalCorrectAnswers = {
+    'player1': {
+      'barata': 0,
+      'minhoca': 0,
+      'azul': 0,
+    },
+    'player2': {
+      'barata': 0,
+      'minhoca': 0,
+      'azul': 0,
+    }
+  };
+
   @override
   void initState() {
     super.initState();
@@ -353,12 +367,19 @@ class RoletaScreenState extends State<RoletaScreen> with TickerProviderStateMixi
 					setState(() {
 						if (isCorrect) {
 							if (widget.modeGame == TypeModeGame.doisJogador) {
-								if (currentPlayer == player1Name) {
-									if (!player1Animals.contains(selectedAnimal!)) {
-									player1Animals.add(selectedAnimal!);
-									}
-								} else {
-									if (!player2Animals.contains(selectedAnimal!)) {
+								String currentPlayerKey = currentPlayer == player1Name ? 'player1' : 'player2';
+								List<String> currentPlayerAnimals = currentPlayer == player1Name ? player1Animals : player2Animals;
+
+								// Increment counter for current player and animal
+								playerAnimalCorrectAnswers[currentPlayerKey]![selectedAnimal!] = 
+									(playerAnimalCorrectAnswers[currentPlayerKey]![selectedAnimal!] ?? 0) + 1;
+								
+								// Add achievement only after 3 correct answers
+								if (playerAnimalCorrectAnswers[currentPlayerKey]![selectedAnimal!]! >= 3 && 
+									!currentPlayerAnimals.contains(selectedAnimal!)) {
+									if (currentPlayer == player1Name) {
+										player1Animals.add(selectedAnimal!);
+									} else {
 										player2Animals.add(selectedAnimal!);
 									}
 								}
@@ -373,9 +394,14 @@ class RoletaScreenState extends State<RoletaScreen> with TickerProviderStateMixi
 								if (player1Animals.contains(selectedAnimal!)) {
 									qtdIncorreta++;
 									player1Animals.remove(selectedAnimal!);
+									// Reset counter for this animal when losing achievement
+									playerAnimalCorrectAnswers['player1']![selectedAnimal!] = 0;
 								}
 								_checkForLooser();
-							}else{
+							} else {
+								String currentPlayerKey = currentPlayer == player1Name ? 'player1' : 'player2';
+								// Reset counter on wrong answer in two player mode
+								playerAnimalCorrectAnswers[currentPlayerKey]![selectedAnimal!] = 0;
 								currentPlayer = currentPlayer == player1Name ? player2Name : player1Name;
 							}
 						}
