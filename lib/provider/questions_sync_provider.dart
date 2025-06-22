@@ -5,98 +5,90 @@ import 'package:parasitados/database/question_database.dart';
 import 'package:parasitados/service/question_sync_service.dart';
 
 class QuestionsSyncProvider extends ChangeNotifier {
+  final QuestionDatabase _db = QuestionDatabase();
+  Questions _questions = Questions();
 
-	final QuestionDatabase _db = QuestionDatabase();
-	Questions _questions = Questions();
+  bool _isConnected = false;
+  bool _isConnecting = false;
+  bool _hasSynced = false;
 
-	bool _isConnected = false;
-	bool _isConnecting = false;
-	bool _hasSynced = false;
+  QuestionDatabase get db => _db;
+  Questions get questions => _questions;
+  bool get isConnected => _isConnected;
+  Map<int, Question> get allQuestions => _questions.questoes;
 
-	QuestionDatabase get db => _db;
-	Questions get questions => _questions;
-	bool get isConnected => _isConnected;
-	Map<int, Question> get allQuestions => _questions.questoes;
-	
-	Future<void> connect() async {
-		if (!_isConnected && !_isConnecting) {
-			_isConnecting = true;
-			_isConnected = await _db.connect();
-			_isConnecting = false;
-			notifyListeners();
-		}
-	}
+  Future<void> connect() async {
+    if (!_isConnected && !_isConnecting) {
+      _isConnecting = true;
+      _isConnected = await _db.connect();
+      _isConnecting = false;
+      notifyListeners();
+    }
+  }
 
-	Future<Map<int, dynamic>> getAllQuestions() async {
-		return await _db.getAllQuestions();
-	}
+  Future<Map<int, dynamic>> getAllQuestions() async {
+    return await _db.getAllQuestions();
+  }
 
-	Future<Map<String, dynamic>?> getQuestion(int id) async {
-		return await _db.getQuestion(id);
-	}
+  Future<Map<String, dynamic>?> getQuestion(int id) async {
+    return await _db.getQuestion(id);
+  }
 
-	Future<Questions?> syncToLocal() async {
-		return await _db.databaseToLocal();
-	}
+  Future<Questions?> syncToLocal() async {
+    return await _db.databaseToLocal();
+  }
 
-	Future<int> addQuestion(
-		Question questionData,
-	) async {
-		final result = await QuestionSyncService.addQuestionSync(
-			questionData: questionData,
-			questions: questions,
-			db: _db,
-		);
-		notifyListeners();
-		return result;
-	}
+  Future<int> addQuestion(Question questionData) async {
+    final result = await QuestionSyncService.addQuestionSync(
+      questionData: questionData,
+      questions: questions,
+      db: _db,
+    );
+    notifyListeners();
+    return result;
+  }
 
-	Future<bool> updateQuestion(
-		int id, Question question,
-	) async {
-		final result = await QuestionSyncService.updateQuestionSync(
-			id: id,
-			question: question,
-			questions: questions,
-			db: _db,
-		);
-		notifyListeners();
-		return result;
-	}
+  Future<bool> updateQuestion(int id, Question question) async {
+    final result = await QuestionSyncService.updateQuestionSync(
+      id: id,
+      question: question,
+      questions: questions,
+      db: _db,
+    );
+    notifyListeners();
+    return result;
+  }
 
-	Future<bool> delQuestion(
-		int id,
-	) async {
-		final result = await QuestionSyncService.delQuestionSync(
-			id: id,
-			questions: questions,
-			db: _db,
-		);
-		notifyListeners();
-		return result;
-	}
+  Future<bool> delQuestion(int id) async {
+    final result = await QuestionSyncService.delQuestionSync(
+      id: id,
+      questions: questions,
+      db: _db,
+    );
+    notifyListeners();
+    return result;
+  }
 
-	Future<void> loadFromCSV() async {
-		_questions = await Questions.fromCsvFile();
-		notifyListeners();
-	}
-	
-	Future<void> syncAllQuestionsDatabaseToLocal(BuildContext context) async {
-		if (_hasSynced) return;
+  Future<void> loadFromCSV() async {
+    _questions = await Questions.fromCsvFile();
+    notifyListeners();
+  }
 
-		Questions? loadedFromCsv;
+  Future<void> syncAllQuestionsDatabaseToLocal(BuildContext context) async {
+    if (_hasSynced) return;
 
-		_questions = (await syncToLocal())!;
-		_questions.quantQuestion;
+    Questions? loadedFromCsv;
 
-		if (_db.pgDatabase!.usePostgresLocal) {
-			debugPrint('Carregado do json ${_questions.quantQuestion}');
-		} else {
-			debugPrint('Carregado do banco ${_questions.quantQuestion}');
-		}
+    _questions = (await syncToLocal())!;
+    _questions.quantQuestion;
 
-		_hasSynced = true;
-		notifyListeners();
-	}
+    if (_db.pgDatabase!.usePostgresLocal) {
+      debugPrint('Carregado do json ${_questions.quantQuestion}');
+    } else {
+      debugPrint('Carregado do banco ${_questions.quantQuestion}');
+    }
 
+    _hasSynced = true;
+    notifyListeners();
+  }
 }

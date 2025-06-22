@@ -22,76 +22,76 @@ import 'package:provider/provider.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 Future<void> main() async {
-	await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: ".env");
 
-	WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-	FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-	// Inicializa o sqflite para desktop
-	if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-		// Define o caminho para a biblioteca SQLite
-		sqfliteFfiInit();
-		databaseFactory = databaseFactoryFfi;
-	}
+  // Inicializa o sqflite para desktop
+  if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+    // Define o caminho para a biblioteca SQLite
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
 
-	// Aguarda o audio tocar e entra no app
-	FlutterNativeSplash.remove();
+  // Aguarda o audio tocar e entra no app
+  FlutterNativeSplash.remove();
 
-	await Supabase.initialize(
-		url: dotenv.env['PUBLIC_SUPABASE_URL'] ?? '',
-		anonKey: dotenv.env['PUBLIC_SUPABASE_ANON_KEY'] ?? '',
-	);
+  await Supabase.initialize(
+    url: dotenv.env['PUBLIC_SUPABASE_URL'] ?? '',
+    anonKey: dotenv.env['PUBLIC_SUPABASE_ANON_KEY'] ?? '',
+  );
 
-	runApp(
-		MultiProvider(
-			providers: [
-				ChangeNotifierProvider(create: (_) => QuestionsSyncProvider()),
-				ChangeNotifierProvider(create: (_) => RankingProvider()),
-			],
-			child: MyApp(),
-		),
-	);
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => QuestionsSyncProvider()),
+        ChangeNotifierProvider(create: (_) => RankingProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-	const MyApp({super.key});
+  const MyApp({super.key});
 
-	@override
-	Widget build(BuildContext context) {
-		return MaterialApp(
-			debugShowCheckedModeBanner: false,
-			initialRoute: Routes.splashScreen,
-			routes: {
-				Routes.home: (context) => ModeGamePage(),
-				Routes.splashScreen: (context) => SplashScreen(),
-				Routes.questoesDisponiveis: (context) => QuestionsDisponivel(),
-				Routes.questionScreenUmJogador: (context) => RoletaScreenUmJogador(),
-				Routes.questionScreenDoisJogador: (context) => RoletaScreenDoisJogador(),
-				Routes.addQuestion: (context) => AddQuestionsScreen(),
-				Routes.aboutScreen: (context) => AboutPage(),
-				Routes.umJogador: (context) => InicioUmJogador(),
-				Routes.doisJogador: (context) => InicioDoisJogadores(),
-				Routes.loadingScreenUmJogador: (context) => LoadingGameUmJogador(),
-				Routes.loadingScreenDoisJogador: (context) => LoadingGameDoisJogador(),
-				Routes.rankingScreen: (context) => RankingScreen(),
-			},
-			builder: (context, child) {
-				Future.microtask(() async {
-					if (context.mounted) {
-						await Provider.of<QuestionsSyncProvider>(
-							context,
-							listen: false,
-						).connect();
-						if (context.mounted) {
-							await Provider.of<QuestionsSyncProvider>(
-								context,
-								listen: false,
-							).syncAllQuestionsDatabaseToLocal(context);
-						}
-					}
-				});
-				return child!;
-			},
-		);
-	}
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      initialRoute: Routes.splashScreen,
+      routes: {
+        Routes.home: (context) => ModeGamePage(),
+        Routes.splashScreen: (context) => SplashScreen(),
+        Routes.questoesDisponiveis: (context) => QuestionsDisponivel(),
+        Routes.questionScreenUmJogador: (context) => RoletaScreenUmJogador(),
+        Routes.questionScreenDoisJogador: (context) => RoletaScreenDoisJogador(),
+        Routes.addQuestion: (context) => AddQuestionsScreen(),
+        Routes.aboutScreen: (context) => AboutPage(),
+        Routes.umJogador: (context) => InicioUmJogador(),
+        Routes.doisJogador: (context) => InicioDoisJogadores(),
+        Routes.loadingScreenUmJogador: (context) => LoadingGameUmJogador(),
+        Routes.loadingScreenDoisJogador: (context) => LoadingGameDoisJogador(),
+        Routes.rankingScreen: (context) => RankingScreen(),
+      },
+      builder: (context, child) {
+        Future.microtask(() async {
+          if (context.mounted) {
+            await Provider.of<QuestionsSyncProvider>(
+              context,
+              listen: false,
+            ).connect();
+            if (context.mounted) {
+              await Provider.of<QuestionsSyncProvider>(
+                context,
+                listen: false,
+              ).syncAllQuestionsDatabaseToLocal(context);
+            }
+          }
+        });
+        return child!;
+      },
+    );
+  }
 }

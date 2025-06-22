@@ -6,16 +6,13 @@ class ArcTextPainter extends CustomPainter {
   final String text;
   final TextStyle textStyle;
 
-  ArcTextPainter({
-    required this.text,
-    required this.textStyle,
-  });
+  ArcTextPainter({required this.text, required this.textStyle});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final radius = size.height * 2.0; 
-    final angleStart = -pi / 1.32;     
-    final angleSweep = pi / 1.85;        
+    final radius = size.height * 2.0;
+    final angleStart = -pi / 1.32;
+    final angleSweep = pi / 1.85;
 
     final anglePerChar = angleSweep / (text.length - 1);
 

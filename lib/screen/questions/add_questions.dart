@@ -23,60 +23,66 @@ class _AddQuestionsScreenState extends State<AddQuestionsScreen> {
 
   final LoginDatabase dbHelper = LoginDatabase();
 
-	Future<void> _cadastrarQuestao() async {
-		try {
-		final enunciado = enunciadoController.text.trim();
-		final opcaoA = opcaoAController.text.trim();
-		final opcaoB = opcaoBController.text.trim();
-		final opcaoC = opcaoCController.text.trim();
-		final opcaoD = opcaoDController.text.trim();
+  Future<void> _cadastrarQuestao() async {
+    try {
+      final enunciado = enunciadoController.text.trim();
+      final opcaoA = opcaoAController.text.trim();
+      final opcaoB = opcaoBController.text.trim();
+      final opcaoC = opcaoCController.text.trim();
+      final opcaoD = opcaoDController.text.trim();
 
-		if (enunciado.isEmpty ||
-				opcaoA.isEmpty ||
-				opcaoB.isEmpty ||
-				opcaoC.isEmpty ||
-				opcaoD.isEmpty ||
-				selectedOption == null) {
-				ScaffoldMessenger.of(context).showSnackBar(
-				const SnackBar(content: Text('Preencha todos os campos e selecione a correta')),
-			);
-			return;
-		}
-		
-		Question dados = Question(
-			enunciado: enunciado, 
-			topico: "teste", 
-			opcoes: ["1","2","3","4",], 
-			respostaCorreta: 1
-		);
+      if (enunciado.isEmpty ||
+          opcaoA.isEmpty ||
+          opcaoB.isEmpty ||
+          opcaoC.isEmpty ||
+          opcaoD.isEmpty ||
+          selectedOption == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Preencha todos os campos e selecione a correta'),
+          ),
+        );
+        return;
+      }
 
-		int retorno = await Provider.of<QuestionsSyncProvider>(context,listen: false).addQuestion(
-			dados,
-		);
+      Question dados = Question(
+        enunciado: enunciado,
+        topico: "teste",
+        opcoes: ["1", "2", "3", "4"],
+        respostaCorreta: 1,
+      );
 
-		if(mounted){
-			ScaffoldMessenger.of(context).showSnackBar(
-				SnackBar(content: Text('Questão cadastrada com sucesso no Banco de Dados $retorno')),
-			);
-		}
+      int retorno = await Provider.of<QuestionsSyncProvider>(
+        context,
+        listen: false,
+      ).addQuestion(dados);
 
-		enunciadoController.clear();
-		opcaoAController.clear();
-		opcaoBController.clear();
-		opcaoCController.clear();
-		opcaoDController.clear();
-		setState(() {
-			selectedOption = null;
-		});
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Questão cadastrada com sucesso no Banco de Dados $retorno',
+            ),
+          ),
+        );
+      }
 
-		} catch (e) {
-			if(mounted){
-				ScaffoldMessenger.of(context).showSnackBar(
-					SnackBar(content: Text('Erro ao cadastrar questão: $e')),
-				);
-			}
-		}
-	}
+      enunciadoController.clear();
+      opcaoAController.clear();
+      opcaoBController.clear();
+      opcaoCController.clear();
+      opcaoDController.clear();
+      setState(() {
+        selectedOption = null;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao cadastrar questão: $e')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +113,12 @@ class _AddQuestionsScreenState extends State<AddQuestionsScreen> {
         child: Center(
           child: SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(16.0, MediaQuery.of(context).padding.top + 40, 16.0, 16.0),
+              padding: EdgeInsets.fromLTRB(
+                16.0,
+                MediaQuery.of(context).padding.top + 40,
+                16.0,
+                16.0,
+              ),
               child: Column(
                 children: [
                   Image.asset('assets/images/LogoApp.png', height: 230),
@@ -216,4 +227,3 @@ class _AddQuestionsScreenState extends State<AddQuestionsScreen> {
     );
   }
 }
-

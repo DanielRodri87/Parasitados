@@ -29,24 +29,18 @@ class InicioDoisJogadores extends StatelessWidget {
         ),
         child: Column(
           children: [
-			Row(
-				children: [
-					IconButton(
-						onPressed: (){
-							Navigator.pop(context);
-						}, 
-						icon: Icon(
-							Icons.arrow_back_outlined,
-							color: Colors.white,
-						)
-					)
-				],
-			),
-            const SizedBox(height: 30),
-            Image.asset(
-              'assets/images/LogoApp.png',
-              height: 260,
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(Icons.arrow_back_outlined, color: Colors.white),
+                ),
+              ],
             ),
+            const SizedBox(height: 30),
+            Image.asset('assets/images/LogoApp.png', height: 260),
             const Expanded(
               child: ClipRRect(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(60)),
@@ -76,24 +70,22 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
   Future<void> salvarNoBanco() async {
     if (nome1.isEmpty || nome2.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, preencha os nomes dos jogadores')),
+        const SnackBar(
+          content: Text('Por favor, preencha os nomes dos jogadores'),
+        ),
       );
       return;
     }
 
     final db = await LoginDatabase().database;
 
-    await db.insert(
-      'login',
-      {
-        'id': 1, // Sempre sobrescrevendo este registro
-        'nome1': nome1,
-        'nome2': nome2,
-        'foto1': foto1.isNotEmpty ? foto1 : null,
-        'foto2': foto2.isNotEmpty ? foto2 : null,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await db.insert('login', {
+      'id': 1, // Sempre sobrescrevendo este registro
+      'nome1': nome1,
+      'nome2': nome2,
+      'foto1': foto1.isNotEmpty ? foto1 : null,
+      'foto2': foto2.isNotEmpty ? foto2 : null,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   @override
@@ -119,10 +111,7 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                  Image.asset(
-                    'assets/images/gato_login.png',
-                    height: 80,
-                  ),
+                  Image.asset('assets/images/gato_login.png', height: 80),
                   const SizedBox(height: 10),
                   const Text(
                     'Olá, Seja Bem-vindo!',
@@ -145,34 +134,42 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
                     onImageSelected: (path) => setState(() => foto2 = path),
                   ),
                   const SizedBox(height: 30),
-				  ElevatedButton(
-					onPressed: (nome1.isNotEmpty && nome2.isNotEmpty)
-						? () async {
-						try {
-							await salvarNoBanco();
-							if (!context.mounted) return;
-							Navigator.pushNamed(context, Routes.loadingScreenDoisJogador);
-						} catch (e) {
-							if (!context.mounted) return;
-							ScaffoldMessenger.of(context).showSnackBar(
-								SnackBar(content: Text('Erro ao salvar os dados: $e')),
-							);
-						}
-						}
-						: null,
+                  ElevatedButton(
+                    onPressed:
+                        (nome1.isNotEmpty && nome2.isNotEmpty)
+                            ? () async {
+                              try {
+                                await salvarNoBanco();
+                                if (!context.mounted) return;
+                                Navigator.pushNamed(
+                                  context,
+                                  Routes.loadingScreenDoisJogador,
+                                );
+                              } catch (e) {
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Erro ao salvar os dados: $e',
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                            : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF00DB8F),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 100,
+                        vertical: 15,
+                      ),
                     ),
                     child: const Text(
                       'Entrar',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
+                      style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -207,7 +204,9 @@ class _CustomInputFieldState extends State<CustomInputField> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final XFile? pickedImage = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedImage = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
 
     if (pickedImage != null) {
       setState(() {
@@ -228,18 +227,20 @@ class _CustomInputFieldState extends State<CustomInputField> {
         hintText: widget.hintText,
         prefixIcon: Image.asset('assets/images/user.png', scale: 2),
         suffixIcon: IconButton(
-          icon: _selectedImage == null
-              ? Image.asset('assets/images/add_foto.png', scale: 2)
-              : CircleAvatar(
-                  backgroundImage: FileImage(_selectedImage!),
-                  radius: 16,
-                ),
+          icon:
+              _selectedImage == null
+                  ? Image.asset('assets/images/add_foto.png', scale: 2)
+                  : CircleAvatar(
+                    backgroundImage: FileImage(_selectedImage!),
+                    radius: 16,
+                  ),
           onPressed: _pickImage,
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 15,
         ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
       ),
     );
   }

@@ -12,7 +12,7 @@ class InicioUmJogador extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
@@ -58,7 +58,7 @@ class InicioUmJogador extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               // Logo com animação
               TweenAnimationBuilder(
                 duration: const Duration(milliseconds: 800),
@@ -76,9 +76,9 @@ class InicioUmJogador extends StatelessWidget {
                   );
                 },
               ),
-              
+
               SizedBox(height: size.height * 0.02),
-              
+
               // Container principal
               Expanded(
                 child: Container(
@@ -130,23 +130,15 @@ class _LoginFormContainerState extends State<LoginFormContainer>
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-    
-    _slideAnimation = Tween<double>(
-      begin: 50,
-      end: 0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    ));
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-    
+
+    _slideAnimation = Tween<double>(begin: 50, end: 0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+
     lerDados();
     _animationController.forward();
   }
@@ -186,22 +178,18 @@ class _LoginFormContainerState extends State<LoginFormContainer>
     final int id = await userDb.addUser(nome1);
     await UserDatabase.salvarUserLocal(nome1, id);
 
-    await db.insert(
-      'login',
-      {
-        'id': 1,
-        'nome1': nome1,
-        'nome2': 'fake',
-        'foto1': foto1.isNotEmpty ? foto1 : null,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await db.insert('login', {
+      'id': 1,
+      'nome1': nome1,
+      'nome2': 'fake',
+      'foto1': foto1.isNotEmpty ? foto1 : null,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    
+
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -241,7 +229,9 @@ class _LoginFormContainerState extends State<LoginFormContainer>
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF69D1E9).withValues(alpha: 0.3),
+                              color: const Color(
+                                0xFF69D1E9,
+                              ).withValues(alpha: 0.3),
                               blurRadius: 15,
                               spreadRadius: 5,
                             ),
@@ -252,9 +242,9 @@ class _LoginFormContainerState extends State<LoginFormContainer>
                           height: 60,
                         ),
                       ),
-                      
+
                       SizedBox(height: size.height * 0.01),
-                      
+
                       // Título de boas-vindas
                       Text(
                         'Olá, Seja Bem-vindo!',
@@ -265,12 +255,14 @@ class _LoginFormContainerState extends State<LoginFormContainer>
                           letterSpacing: 0.5,
                         ),
                       ),
-                      
+
                       SizedBox(height: size.height * 0.03),
-                      
+
                       // Seção do Pulgo com design moderno
                       Container(
-                        margin: EdgeInsets.symmetric(vertical: size.height * 0.02),
+                        margin: EdgeInsets.symmetric(
+                          vertical: size.height * 0.02,
+                        ),
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -310,9 +302,9 @@ class _LoginFormContainerState extends State<LoginFormContainer>
                                 height: 80,
                               ),
                             ),
-                            
+
                             SizedBox(width: size.width * 0.04),
-                            
+
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -321,22 +313,29 @@ class _LoginFormContainerState extends State<LoginFormContainer>
                                     'Senti pena de você... então decidi fazer caridade emocional. Não se preocupe, não vou te deixar sozinho!',
                                     style: TextStyle(
                                       color: Colors.grey.shade700,
-                                      fontSize: size.width * 0.028, // Reduzido de 0.032
+                                      fontSize:
+                                          size.width *
+                                          0.028, // Reduzido de 0.032
                                       fontWeight: FontWeight.w400,
                                       height: 1.3,
                                     ),
-                                    overflow: TextOverflow.visible, // Garante que o texto quebre
+                                    overflow:
+                                        TextOverflow
+                                            .visible, // Garante que o texto quebre
                                   ),
-                                  
+
                                   SizedBox(height: size.height * 0.01),
-                                  
-                                  Wrap( // Usando Wrap em vez de Row
+
+                                  Wrap(
+                                    // Usando Wrap em vez de Row
                                     children: [
                                       Text(
                                         'Atenciosamente: ',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w500,
-                                          fontSize: size.width * 0.028, // Reduzido de 0.032
+                                          fontSize:
+                                              size.width *
+                                              0.028, // Reduzido de 0.032
                                           color: Colors.grey.shade600,
                                         ),
                                       ),
@@ -344,7 +343,9 @@ class _LoginFormContainerState extends State<LoginFormContainer>
                                         'Pulgo',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: size.width * 0.028, // Reduzido de 0.032
+                                          fontSize:
+                                              size.width *
+                                              0.028, // Reduzido de 0.032
                                           color: const Color(0xFF69D1E9),
                                         ),
                                       ),
@@ -356,7 +357,7 @@ class _LoginFormContainerState extends State<LoginFormContainer>
                           ],
                         ),
                       ),
-                      
+
                       // Mensagem de boas-vindas para usuário existente
                       if (nomeFinal != null)
                         Padding(
@@ -371,74 +372,84 @@ class _LoginFormContainerState extends State<LoginFormContainer>
                             textAlign: TextAlign.center,
                           ),
                         ),
-                      
+
                       // Campo de entrada moderno
                       CustomInputField(
-                        hintText: nomeFinal == null 
-                            ? 'Digite seu nome aqui' 
-                            : 'Nome salvo: $nomeFinal',
+                        hintText:
+                            nomeFinal == null
+                                ? 'Digite seu nome aqui'
+                                : 'Nome salvo: $nomeFinal',
                         onNameChanged: (v) => setState(() => nome1 = v),
                         onImageSelected: (p) => setState(() => foto1 = p),
                         enabled: nomeFinal == null,
                       ),
-                      
+
                       SizedBox(height: size.height * 0.04),
-                      
+
                       // Botão de entrada moderno
                       Container(
                         width: double.infinity,
                         height: 55,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: (nome1.isNotEmpty || nomeFinal != null)
-                                ? [
-                                    const Color(0xFF69D1E9),
-                                    const Color(0xFF81DC6E),
-                                  ]
-                                : [
-                                    Colors.grey.shade300,
-                                    Colors.grey.shade400,
-                                  ],
+                            colors:
+                                (nome1.isNotEmpty || nomeFinal != null)
+                                    ? [
+                                      const Color(0xFF69D1E9),
+                                      const Color(0xFF81DC6E),
+                                    ]
+                                    : [
+                                      Colors.grey.shade300,
+                                      Colors.grey.shade400,
+                                    ],
                             begin: Alignment.centerLeft,
                             end: Alignment.centerRight,
                           ),
                           borderRadius: BorderRadius.circular(15),
-                          boxShadow: (nome1.isNotEmpty || nomeFinal != null)
-                              ? [
-                                  BoxShadow(
-                                    color: const Color(0xFF69D1E9).withValues(alpha: 0.4),
-                                    blurRadius: 15,
-                                    spreadRadius: 2,
-                                    offset: const Offset(0, 5),
-                                  ),
-                                ]
-                              : [],
+                          boxShadow:
+                              (nome1.isNotEmpty || nomeFinal != null)
+                                  ? [
+                                    BoxShadow(
+                                      color: const Color(
+                                        0xFF69D1E9,
+                                      ).withValues(alpha: 0.4),
+                                      blurRadius: 15,
+                                      spreadRadius: 2,
+                                      offset: const Offset(0, 5),
+                                    ),
+                                  ]
+                                  : [],
                         ),
                         child: ElevatedButton(
-                          onPressed: (nome1.isNotEmpty || nomeFinal != null)
-                              ? () async {
-                                  try {
-                                    await salvarNoBanco();
-                                    if (!context.mounted) return;
-                                    Navigator.pushReplacementNamed(
-                                      context,
-                                      Routes.loadingScreenUmJogador,
-                                    );
-                                  } catch (e) {
-                                    if (!context.mounted) return;
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('Erro ao salvar: $e'),
-                                        backgroundColor: Colors.red.shade400,
-                                        behavior: SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
+                          onPressed:
+                              (nome1.isNotEmpty || nomeFinal != null)
+                                  ? () async {
+                                    try {
+                                      await salvarNoBanco();
+                                      if (!context.mounted) return;
+                                      Navigator.pushReplacementNamed(
+                                        context,
+                                        Routes.loadingScreenUmJogador,
+                                      );
+                                    } catch (e) {
+                                      if (!context.mounted) return;
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Erro ao salvar: $e'),
+                                          backgroundColor: Colors.red.shade400,
+                                          behavior: SnackBarBehavior.floating,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    );
+                                      );
+                                    }
                                   }
-                                }
-                              : null,
+                                  : null,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
                             shadowColor: Colors.transparent,
@@ -468,7 +479,7 @@ class _LoginFormContainerState extends State<LoginFormContainer>
                           ),
                         ),
                       ),
-                      
+
                       SizedBox(height: size.height * 0.02),
                     ],
                   ),
@@ -514,13 +525,9 @@ class _CustomInputFieldState extends State<CustomInputField>
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.05,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -550,7 +557,7 @@ class _CustomInputFieldState extends State<CustomInputField>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    
+
     return AnimatedBuilder(
       animation: _scaleAnimation,
       builder: (context, child) {
@@ -559,21 +566,22 @@ class _CustomInputFieldState extends State<CustomInputField>
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              boxShadow: _isFocused
-                  ? [
-                      BoxShadow(
-                        color: const Color(0xFF69D1E9).withValues(alpha: 0.3),
-                        blurRadius: 15,
-                        spreadRadius: 2,
-                      ),
-                    ]
-                  : [
-                      BoxShadow(
-                        color: Colors.grey.withValues(alpha: 0.1),
-                        blurRadius: 8,
-                        spreadRadius: 1,
-                      ),
-                    ],
+              boxShadow:
+                  _isFocused
+                      ? [
+                        BoxShadow(
+                          color: const Color(0xFF69D1E9).withValues(alpha: 0.3),
+                          blurRadius: 15,
+                          spreadRadius: 2,
+                        ),
+                      ]
+                      : [
+                        BoxShadow(
+                          color: Colors.grey.withValues(alpha: 0.1),
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                        ),
+                      ],
             ),
             child: Focus(
               onFocusChange: (hasFocus) {
@@ -604,9 +612,10 @@ class _CustomInputFieldState extends State<CustomInputField>
                     child: Image.asset(
                       'assets/images/user.png',
                       scale: 2,
-                      color: _isFocused 
-                          ? const Color(0xFF69D1E9) 
-                          : Colors.grey.shade400,
+                      color:
+                          _isFocused
+                              ? const Color(0xFF69D1E9)
+                              : Colors.grey.shade400,
                     ),
                   ),
                   suffixIcon: GestureDetector(
@@ -615,26 +624,28 @@ class _CustomInputFieldState extends State<CustomInputField>
                       padding: const EdgeInsets.all(8),
                       margin: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: _selectedImage != null 
-                            ? Colors.transparent 
-                            : Colors.grey.shade100,
+                        color:
+                            _selectedImage != null
+                                ? Colors.transparent
+                                : Colors.grey.shade100,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: _selectedImage == null
-                          ? Icon(
-                              Icons.add_a_photo_outlined,
-                              color: Colors.grey.shade600,
-                              size: 24,
-                            )
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.file(
-                                _selectedImage!,
-                                width: 40,
-                                height: 40,
-                                fit: BoxFit.cover,
+                      child:
+                          _selectedImage == null
+                              ? Icon(
+                                Icons.add_a_photo_outlined,
+                                color: Colors.grey.shade600,
+                                size: 24,
+                              )
+                              : ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.file(
+                                  _selectedImage!,
+                                  width: 40,
+                                  height: 40,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                            ),
                     ),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
