@@ -23,7 +23,6 @@ class PostgresLocalHelper {
 				database: database,
 				username: username,
 				password: password,
-
 			),
 			settings: ConnectionSettings(
 				sslMode: SslMode.disable
