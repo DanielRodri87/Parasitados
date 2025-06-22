@@ -45,7 +45,7 @@ class RoletaScreenState extends State<RoletaScreen> with TickerProviderStateMixi
   int qtdRespondida = 0;
 
   final List<String> animals = ['barata', 'minhoca', 'azul'];
-  final List<String> wheelOptions = ['minhoca', 'azul', 'barata', 'passar_vez'];
+  late List<String> wheelOptions;
   double finalRotation = 0;
   
   // Map for gray (unachieved) images
@@ -72,6 +72,9 @@ class RoletaScreenState extends State<RoletaScreen> with TickerProviderStateMixi
   @override
   void initState() {
     super.initState();
+    wheelOptions = widget.modeGame == TypeModeGame.doisJogador 
+        ? ['minhoca', 'azul', 'barata', 'passar_vez']
+        : ['minhoca', 'azul', 'barata'];
     _loadPlayers();
     _controller = AnimationController(
       duration: const Duration(seconds: 3),
@@ -194,7 +197,7 @@ class RoletaScreenState extends State<RoletaScreen> with TickerProviderStateMixi
 		_controller.forward(from: 0).whenComplete(() {
 			// Calcula onde a seta está apontando (4 seções de 90 graus cada)
 			final normalizedRotation = (totalRotation * 2 * pi) % (2 * pi);
-			final sectionAngle = (2 * pi) / 4; // 4 opções na roleta
+			final sectionAngle = (2 * pi) / wheelOptions.length; // Use wheelOptions.length instead of fixed 4
 			
 			// A seta aponta para baixo, então ajustamos para começar do topo
 			final adjustedAngle = (normalizedRotation + (pi / 2)) % (2 * pi);
