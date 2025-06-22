@@ -75,111 +75,126 @@ class AboutPage extends StatelessWidget {
                       ),
                     ),
                     // Conteúdo principal
-                    SafeArea(
-                      child: Padding(
+          SafeArea(
+            child: Padding(
+              padding: EdgeInsets.all(isSmallScreen ? 8 : isMediumScreen ? 12 : 16),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: isSmallScreen
+                        ? double.infinity
+                        : isMediumScreen
+                            ? 400
+                            : 500,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Logo com efeito de glow responsivo
+                      Container(
                         padding: EdgeInsets.all(isSmallScreen ? 8 : isMediumScreen ? 12 : 16),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Logo com efeito de glow responsivo
-                            Container(
-                              padding: EdgeInsets.all(isSmallScreen ? 8 : isMediumScreen ? 12 : 16),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withAlpha(38),
-                                borderRadius: BorderRadius.circular(isSmallScreen ? 12 : isMediumScreen ? 16 : 20),
-                                border: Border.all(
-                                  color: Colors.white.withAlpha(76),
-                                  width: 1,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.white.withAlpha(25),
-                                    blurRadius: isSmallScreen ? 10 : isMediumScreen ? 15 : 20,
-                                    spreadRadius: isSmallScreen ? 2 : isMediumScreen ? 3 : 5,
-                                  ),
-                                ],
-                              ),
-                              child: Image.asset(
-                                'assets/images/carraputo.png',
-                                height: isSmallScreen ? 50 : isMediumScreen ? 65 : 80,
-                              ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withAlpha(38),
+                          borderRadius: BorderRadius.circular(isSmallScreen ? 12 : isMediumScreen ? 16 : 20),
+                          border: Border.all(
+                            color: Colors.white.withAlpha(76),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.white.withAlpha(25),
+                              blurRadius: isSmallScreen ? 10 : isMediumScreen ? 15 : 20,
+                              spreadRadius: isSmallScreen ? 2 : isMediumScreen ? 3 : 5,
                             ),
-                            SizedBox(height: isSmallScreen ? 12 : isMediumScreen ? 16 : 20),
-                            
-                            // Título com efeito moderno responsivo
-                            Column(
-                              children: [
-                                Text(
-                                  '🔬 LABORATÓRIO DE EXCELÊNCIA',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: isSmallScreen ? 16 : isMediumScreen ? 19 : 22,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: isSmallScreen ? 0.5 : 1,
-                                    shadows: const [
-                                      Shadow(
-                                        color: Colors.black26,
-                                        blurRadius: 4,
-                                        offset: Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                SizedBox(height: isSmallScreen ? 4 : 8),
-                                Text(
-                                  'Pesquisa & Inovação em Parasitologia',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: isSmallScreen ? 12 : isMediumScreen ? 14 : 16,
-                                    fontWeight: FontWeight.w500,
-                                    letterSpacing: isSmallScreen ? 0.2 : 0.5,
-                                    shadows: const [
-                                      Shadow(
-                                        color: Colors.black26,
-                                        blurRadius: 4,
-                                        offset: Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  textAlign: TextAlign.center,
+                          ],
+                        ),
+                        child: Image.asset(
+                          'assets/images/carraputo.png',
+                          height: isSmallScreen ? 50 : isMediumScreen ? 65 : 80,
+                        ),
+                      ),
+                      SizedBox(height: isSmallScreen ? 12 : isMediumScreen ? 16 : 20),
+
+                      // Título com efeito moderno responsivo
+                      Column(
+                        children: [
+                          Text(
+                            '🔬 LABORATÓRIO DE EXCELÊNCIA',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isSmallScreen ? 16 : isMediumScreen ? 19 : 22,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: isSmallScreen ? 0.5 : 1,
+                              shadows: const [
+                                Shadow(
+                                  color: Colors.black26,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
                                 ),
                               ],
                             ),
-                            SizedBox(height: isSmallScreen ? 8 : 10),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: isSmallScreen ? 4 : 8),
+                          Text(
+                            'Pesquisa & Inovação em Parasitologia',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isSmallScreen ? 12 : isMediumScreen ? 14 : 16,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: isSmallScreen ? 0.2 : 0.5,
+                              shadows: const [
+                                Shadow(
+                                  color: Colors.black26,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: isSmallScreen ? 8 : 10),
 
-                            // Botões sociais modernos responsivos
-                            Flexible(
-                              child: Wrap(
-                                alignment: WrapAlignment.spaceEvenly,
-                                spacing: isSmallScreen ? 4 : 8,
-                                runSpacing: isSmallScreen ? 4 : 8,
-                                children: [
-                                  ModernSocialButton(
-                                    icon: Icons.camera_alt,
-                                    label: 'Instagram',
-                                    onTap: () => launchUrl(Uri.parse('https://www.instagram.com/ladopar.nezoon/')),
-                                    isSmallScreen: isSmallScreen,
-                                  ),
-                                  ModernSocialButton(
-                                    icon: Icons.email_outlined,
-                                    label: 'E-mail',
-                                    onTap: () => launchUrl(Uri.parse('mailto:techkua@gmail.com')),
-                                    isSmallScreen: isSmallScreen,
-                                  ),
-                                  ModernSocialButton(
-                                    icon: Icons.code,
-                                    label: 'GitHub',
-                                    onTap: () => launchUrl(Uri.parse('https://github.com/Kua-Tech')),
-                                    isSmallScreen: isSmallScreen,
-                                  ),
-                                ],
-                              ),
+                      // Botões sociais modernos responsivos
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isSmallScreen ? 0 : 8,
+                        ),
+                        child: Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: isSmallScreen ? 4 : 8,
+                          runSpacing: isSmallScreen ? 4 : 8,
+                          children: [
+                            ModernSocialButton(
+                              icon: Icons.camera_alt,
+                              label: 'Instagram',
+                              onTap: () => launchUrl(Uri.parse('https://www.instagram.com/ladopar.nezoon/')),
+                              isSmallScreen: isSmallScreen,
+                            ),
+                            ModernSocialButton(
+                              icon: Icons.email_outlined,
+                              label: 'E-mail',
+                              onTap: () => launchUrl(Uri.parse('mailto:techkua@gmail.com')),
+                              isSmallScreen: isSmallScreen,
+                            ),
+                            ModernSocialButton(
+                              icon: Icons.code,
+                              label: 'GitHub',
+                              onTap: () => launchUrl(Uri.parse('https://github.com/Kua-Tech')),
+                              isSmallScreen: isSmallScreen,
                             ),
                           ],
                         ),
                       ),
-                    ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
                   ],
                 ),
               ),
