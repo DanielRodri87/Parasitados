@@ -3,126 +3,129 @@ import 'package:parasitados/database/user_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RankingDatabase {
-	PgDatabase? pgDatabase;
+  PgDatabase? pgDatabase;
 
-  	RankingDatabase(){
-		pgDatabase = PgDatabase();
-	}
-	
-	Future<int> inserirRanking({
-		required int qtdAcertos,
-		required double taxaDeAcerto,
-		required double tempoRealizado,
-	}) async {
-		int retorno = 0;
-		final Map<String, dynamic>? user = await UserDatabase.lerUserLocal();		
-		if(!(user!['onDb'] as bool)){
-			try {
-				if(pgDatabase!.usePostgresLocal){
-					await pgDatabase?.pgHelper?.connect();
-					
-					await pgDatabase?.pgHelper?.execute(
-						'INSERT INTO ranking_jogadores (id_da_pessoa, qtd_acertos, taxa_de_acerto, tempo_realizado) VALUES (@id_da_pessoa, @qtd_acertos, @taxa_de_acerto, @tempo_realizado)',
-						substitutionValues: {
-							'id_da_pessoa': user["id"],
-							'qtd_acertos': qtdAcertos,
-							'taxa_de_acerto': taxaDeAcerto,
-							'tempo_realizado': tempoRealizado,
-						},
-					);
-					await pgDatabase?.pgHelper?.close();
-				}else{
-					await pgDatabase!.supabase!.from('ranking_jogadores').upsert({
-						'id_da_pessoa': user["id"],
-						'qtd_acertos': qtdAcertos,
-						'taxa_de_acerto': taxaDeAcerto,
-						'tempo_realizado': tempoRealizado,
-					}).select();
-				}
-				
-				final prefs = await SharedPreferences.getInstance();
-				await prefs.setBool('on_db', true);
+  RankingDatabase() {
+    pgDatabase = PgDatabase();
+  }
 
-				retorno = 1;
-			} catch (e) {
-				retorno = -1;
-			}
-		}
+  Future<int> inserirRanking({
+    required int qtdAcertos,
+    required double taxaDeAcerto,
+    required double tempoRealizado,
+  }) async {
+    int retorno = 0;
+    final Map<String, dynamic>? user = await UserDatabase.lerUserLocal();
+    if (!(user!['onDb'] as bool)) {
+      try {
+        if (pgDatabase!.usePostgresLocal) {
+          await pgDatabase?.pgHelper?.connect();
 
-		return retorno;
-	}
+          await pgDatabase?.pgHelper?.execute(
+            'INSERT INTO ranking_jogadores (id_da_pessoa, qtd_acertos, taxa_de_acerto, tempo_realizado) VALUES (@id_da_pessoa, @qtd_acertos, @taxa_de_acerto, @tempo_realizado)',
+            substitutionValues: {
+              'id_da_pessoa': user["id"],
+              'qtd_acertos': qtdAcertos,
+              'taxa_de_acerto': taxaDeAcerto,
+              'tempo_realizado': tempoRealizado,
+            },
+          );
+          await pgDatabase?.pgHelper?.close();
+        } else {
+          await pgDatabase!.supabase!.from('ranking_jogadores').upsert({
+            'id_da_pessoa': user["id"],
+            'qtd_acertos': qtdAcertos,
+            'taxa_de_acerto': taxaDeAcerto,
+            'tempo_realizado': tempoRealizado,
+          }).select();
+        }
 
-	Future<void> atualizarRanking({
-		required int qtdAcertos,
-		required double taxaDeAcerto,
-		required double tempoRealizado,
-	}) async {
-		final Map<String, dynamic>? user = await UserDatabase.lerUserLocal();		
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('on_db', true);
 
-		if(user != null){
-			if(pgDatabase!.usePostgresLocal){
-				await pgDatabase?.pgHelper?.connect();
-				await pgDatabase?.pgHelper?.execute(
-					'UPDATE ranking_jogadores SET qtd_acertos = @qtd_acertos, taxa_de_acerto = @taxa_de_acerto, tempo_realizado = @tempo_realizado WHERE id_da_pessoa = @id_da_pessoa',
-					substitutionValues: {
-						'id_da_pessoa': user["id"],
-						'qtd_acertos': qtdAcertos,
-						'taxa_de_acerto': taxaDeAcerto,
-						'tempo_realizado': tempoRealizado,
-					},
-				);
-				await pgDatabase?.pgHelper?.close();
-			}else{
-				await pgDatabase!.supabase!.from('ranking_jogadores').update({
-					'id_da_pessoa': user["id"],
-					'qtd_acertos': qtdAcertos,
-					'taxa_de_acerto': taxaDeAcerto,
-					'tempo_realizado': tempoRealizado,
-				}).eq('id_da_pessoa', user['id']);
-			}
-		}
-	}
+        retorno = 1;
+      } catch (e) {
+        retorno = -1;
+      }
+    }
 
-	Future<Map<String, dynamic>?> getRankingPorId(int id) async {
-		Map<String, dynamic>? resultado;
-		try {
-			if (pgDatabase!.usePostgresLocal) {
-				await pgDatabase?.pgHelper?.connect();
-				final rows = await pgDatabase?.pgHelper?.query(
-					'SELECT * FROM ranking_jogadores WHERE id_da_pessoa = @id',
-					substitutionValues: {'id': id},
-				);
-				await pgDatabase?.pgHelper?.close();
-				if (rows != null) {
-					resultado = Map<String, dynamic>.from(rows);
-					// Transforma taxa_de_acerto em porcentagem
-					if (resultado['taxa_de_acerto'] != null) {
-					resultado['taxa_de_acerto'] =
-						((resultado['taxa_de_acerto'] as double) * 100);
-					}
-				}
-			} else {
-				final response = await pgDatabase!.supabase!
-					.from('ranking_jogadores')
-					.select()
-					.eq('id_da_pessoa', id)
-					.limit(1);
-				if (response.isNotEmpty) {
-				resultado = Map<String, dynamic>.from(response.first);
-				}
-			}
-		} catch (e) {
-			resultado = null;
-		}
-		return resultado;
-  	}
+    return retorno;
+  }
 
-	Future<int?> getRankingPosicaoPorId(int id) async {
-		try {
-			if (pgDatabase!.usePostgresLocal) {
-				await pgDatabase?.pgHelper?.connect();
-				final rows = await pgDatabase?.pgHelper?.query(
-					'''
+  Future<void> atualizarRanking({
+    required int qtdAcertos,
+    required double taxaDeAcerto,
+    required double tempoRealizado,
+  }) async {
+    final Map<String, dynamic>? user = await UserDatabase.lerUserLocal();
+
+    if (user != null) {
+      if (pgDatabase!.usePostgresLocal) {
+        await pgDatabase?.pgHelper?.connect();
+        await pgDatabase?.pgHelper?.execute(
+          'UPDATE ranking_jogadores SET qtd_acertos = @qtd_acertos, taxa_de_acerto = @taxa_de_acerto, tempo_realizado = @tempo_realizado WHERE id_da_pessoa = @id_da_pessoa',
+          substitutionValues: {
+            'id_da_pessoa': user["id"],
+            'qtd_acertos': qtdAcertos,
+            'taxa_de_acerto': taxaDeAcerto,
+            'tempo_realizado': tempoRealizado,
+          },
+        );
+        await pgDatabase?.pgHelper?.close();
+      } else {
+        await pgDatabase!.supabase!
+            .from('ranking_jogadores')
+            .update({
+              'id_da_pessoa': user["id"],
+              'qtd_acertos': qtdAcertos,
+              'taxa_de_acerto': taxaDeAcerto,
+              'tempo_realizado': tempoRealizado,
+            })
+            .eq('id_da_pessoa', user['id']);
+      }
+    }
+  }
+
+  Future<Map<String, dynamic>?> getRankingPorId(int id) async {
+    Map<String, dynamic>? resultado;
+    try {
+      if (pgDatabase!.usePostgresLocal) {
+        await pgDatabase?.pgHelper?.connect();
+        final rows = await pgDatabase?.pgHelper?.query(
+          'SELECT * FROM ranking_jogadores WHERE id_da_pessoa = @id',
+          substitutionValues: {'id': id},
+        );
+        await pgDatabase?.pgHelper?.close();
+        if (rows != null) {
+          resultado = Map<String, dynamic>.from(rows);
+          // Transforma taxa_de_acerto em porcentagem
+          if (resultado['taxa_de_acerto'] != null) {
+            resultado['taxa_de_acerto'] =
+                ((resultado['taxa_de_acerto'] as double) * 100);
+          }
+        }
+      } else {
+        final response = await pgDatabase!.supabase!
+            .from('ranking_jogadores')
+            .select()
+            .eq('id_da_pessoa', id)
+            .limit(1);
+        if (response.isNotEmpty) {
+          resultado = Map<String, dynamic>.from(response.first);
+        }
+      }
+    } catch (e) {
+      resultado = null;
+    }
+    return resultado;
+  }
+
+  Future<int?> getRankingPosicaoPorId(int id) async {
+    try {
+      if (pgDatabase!.usePostgresLocal) {
+        await pgDatabase?.pgHelper?.connect();
+        final rows = await pgDatabase?.pgHelper?.query(
+          '''
 					WITH dados AS (
 						SELECT
 							r.id_da_pessoa,
@@ -154,25 +157,27 @@ class RankingDatabase {
 					FROM ordenado
 					WHERE id_da_pessoa = @id
 					''',
-					substitutionValues: {'id': id},
-				);
-				await pgDatabase?.pgHelper?.close();
-				if (rows != null) {
-					return rows['posicao'];
-				}
-			} else {
-				final response = await pgDatabase!.supabase!
-					.rpc('get_ranking_por_id', params: {'id_user': id});
+          substitutionValues: {'id': id},
+        );
+        await pgDatabase?.pgHelper?.close();
+        if (rows != null) {
+          return rows['posicao'];
+        }
+      } else {
+        final response = await pgDatabase!.supabase!.rpc(
+          'get_ranking_por_id',
+          params: {'id_user': id},
+        );
 
-				if (response == null) return null;
-				if (response is int) {
-				  return response;
-				}
-				return null;
-			}
-			return null;
-		} catch (e) {
-			return null;
-		}
-	}
+        if (response == null) return null;
+        if (response is int) {
+          return response;
+        }
+        return null;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
 }

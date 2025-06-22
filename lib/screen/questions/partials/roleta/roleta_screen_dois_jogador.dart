@@ -7,8 +7,6 @@ class RoletaScreenDoisJogador extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RoletaScreen(
-		modeGame: TypeModeGame.doisJogador
-	);
+    return RoletaScreen(modeGame: TypeModeGame.doisJogador);
   }
 }

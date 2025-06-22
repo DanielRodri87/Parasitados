@@ -8,12 +8,9 @@ import 'package:parasitados/database/user_database.dart';
 import 'package:parasitados/routes/routes.dart';
 
 class LoadingGamePage extends StatefulWidget {
-	final TypeModeGame tipoModeGame;
+  final TypeModeGame tipoModeGame;
 
-  const LoadingGamePage({
-	super.key,
-	required this.tipoModeGame
-	});
+  const LoadingGamePage({super.key, required this.tipoModeGame});
 
   @override
   State<LoadingGamePage> createState() => _LoadingGamePageState();
@@ -55,11 +52,14 @@ class _LoadingGamePageState extends State<LoadingGamePage> {
   void iniciarTemporizador() {
     Timer(const Duration(seconds: 10), () {
       if (!mounted) return;
-      	if (widget.tipoModeGame == TypeModeGame.umJogador) {
-			Navigator.pushReplacementNamed(context, Routes.questionScreenUmJogador);
-		}else{
-			Navigator.pushReplacementNamed(context, Routes.questionScreenDoisJogador);
-		}
+      if (widget.tipoModeGame == TypeModeGame.umJogador) {
+        Navigator.pushReplacementNamed(context, Routes.questionScreenUmJogador);
+      } else {
+        Navigator.pushReplacementNamed(
+          context,
+          Routes.questionScreenDoisJogador,
+        );
+      }
     });
   }
 
@@ -91,9 +91,9 @@ class _LoadingGamePageState extends State<LoadingGamePage> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(mensagem)));
   }
 
   @override
@@ -117,14 +117,9 @@ class _LoadingGamePageState extends State<LoadingGamePage> {
         child: Column(
           children: [
             const SizedBox(height: 60),
-            Image.asset(
-              'assets/images/LogoApp.png',
-              height: 200,
-            ),
+            Image.asset('assets/images/LogoApp.png', height: 200),
             Expanded(
-              child: PlayerInfoContainer(
-                tipoModeGame: widget.tipoModeGame,
-              ),
+              child: PlayerInfoContainer(tipoModeGame: widget.tipoModeGame),
             ),
           ],
         ),
@@ -134,11 +129,8 @@ class _LoadingGamePageState extends State<LoadingGamePage> {
 }
 
 class PlayerInfoContainer extends StatefulWidget {
-	final TypeModeGame tipoModeGame;
-  const PlayerInfoContainer({
-	super.key,
-	required this.tipoModeGame
-	});
+  final TypeModeGame tipoModeGame;
+  const PlayerInfoContainer({super.key, required this.tipoModeGame});
 
   @override
   State<PlayerInfoContainer> createState() => _PlayerInfoContainerState();
@@ -193,11 +185,14 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
   void iniciarTemporizador() {
     Timer(const Duration(seconds: 5), () {
       if (!mounted) return;
-		if (widget.tipoModeGame == TypeModeGame.umJogador) {
-			Navigator.pushReplacementNamed(context, Routes.questionScreenUmJogador);
-		}else{
-			Navigator.pushReplacementNamed(context, Routes.questionScreenDoisJogador);
-		}
+      if (widget.tipoModeGame == TypeModeGame.umJogador) {
+        Navigator.pushReplacementNamed(context, Routes.questionScreenUmJogador);
+      } else {
+        Navigator.pushReplacementNamed(
+          context,
+          Routes.questionScreenDoisJogador,
+        );
+      }
     });
   }
 
@@ -220,11 +215,13 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
       if (resultado.isNotEmpty) {
         final dados = resultado.first;
         setState(() {
-		  nome1 = (dados['nome1'] != null && (dados['nome1'] as String).isNotEmpty)
-			  ? dados['nome1']
-			  : (dadosShared?['nome'] != null && (dadosShared?['nome'] as String).isNotEmpty)
-				  ? dadosShared!['nome']
-				  : 'Jogador 1';
+          nome1 =
+              (dados['nome1'] != null && (dados['nome1'] as String).isNotEmpty)
+                  ? dados['nome1']
+                  : (dadosShared?['nome'] != null &&
+                      (dadosShared?['nome'] as String).isNotEmpty)
+                  ? dadosShared!['nome']
+                  : 'Jogador 1';
           nome2 = dados['nome2'] as String? ?? 'Jogador 2';
           foto1 = dados['foto1'] as String?;
           foto2 = dados['foto2'] as String?;
@@ -242,9 +239,9 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
   }
 
   void _mostrarErro(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(mensagem)));
   }
 
   @override
@@ -255,97 +252,89 @@ class _PlayerInfoContainerState extends State<PlayerInfoContainer> {
   }
 
   Widget playerCard(String nome, String? foto) {
-	
-	return LayoutBuilder(
-	  builder: (context, constraints) {
-		// Define o raio do avatar proporcional à largura disponível, com limites mínimo/máximo
-		double avatarRadius = (constraints.maxWidth / 4).clamp(50.0, 60.0);
-		return Column(
-		  mainAxisSize: MainAxisSize.min,
-		  children: [
-			CircleAvatar(
-			  radius: avatarRadius,
-			  backgroundColor: Colors.grey.shade200,
-			  backgroundImage: (foto != null && foto.isNotEmpty)
-				  ? FileImage(File(foto))
-				  : const AssetImage('assets/images/gatopreto.png') as ImageProvider,
-			),
-			const SizedBox(height: 16),
-			FittedBox(
-			  fit: BoxFit.scaleDown,
-			  child: Text(
-				nome,
-				style: const TextStyle(
-				  fontSize: 26,
-				  fontWeight: FontWeight.w600,
-				),
-				maxLines: 1,
-				overflow: TextOverflow.ellipsis,
-			  ),
-			),
-		  ],
-		);
-	  },
-	);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Define o raio do avatar proporcional à largura disponível, com limites mínimo/máximo
+        double avatarRadius = (constraints.maxWidth / 4).clamp(50.0, 60.0);
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: avatarRadius,
+              backgroundColor: Colors.grey.shade200,
+              backgroundImage:
+                  (foto != null && foto.isNotEmpty)
+                      ? FileImage(File(foto))
+                      : const AssetImage('assets/images/gatopreto.png')
+                          as ImageProvider,
+            ),
+            const SizedBox(height: 16),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                nome,
+                style: const TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w600,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-	return Container(
-		width: double.infinity,
-		// height: double.infinity,
-		decoration: BoxDecoration(
-			image: DecorationImage(
-				image: AssetImage('assets/images/back_login.png'),
-				fit: BoxFit.fill,
-			)
-		),
-		padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 80),
-		child: Column(
-			mainAxisAlignment: MainAxisAlignment.spaceBetween,
-			children: [
-				if (widget.tipoModeGame == TypeModeGame.doisJogador)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Container(
+      width: double.infinity,
+      // height: double.infinity,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/back_login.png'),
+          fit: BoxFit.fill,
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 80),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          if (widget.tipoModeGame == TypeModeGame.doisJogador)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(child: playerCard(nome1, foto1)),
+                Image.asset('assets/images/fite.png', width: 90),
+                Expanded(child: playerCard(nome2, foto2)),
+              ],
+            )
+          else
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [playerCard(nome1, foto1)],
+            ),
+          Column(
+            spacing: 20,
             children: [
-              Expanded(child: playerCard(nome1, foto1)),
-              Image.asset(
-                'assets/images/fite.png',
-                width: 90,
+              Text(
+                carregandoTexto,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              Expanded(child: playerCard(nome2, foto2)),
+              Text(
+                frases[fraseAtual],
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16, color: Colors.black54),
+              ),
             ],
-          )
-				else
-					Column(
-						mainAxisAlignment: MainAxisAlignment.center,
-						children: [
-							playerCard(nome1, foto1),
-						],
-					),
-				Column(
-					spacing: 20,
-					children: [
-						Text(
-							carregandoTexto,
-							style: const TextStyle(
-								fontSize: 24,
-								fontWeight: FontWeight.bold,
-							),
-						),
-						Text(
-							frases[fraseAtual],
-							textAlign: TextAlign.center,
-							style: const TextStyle(
-							fontSize: 16,
-							color: Colors.black54,
-							),
-						),
-					],
-				)
-				
-			],
-		),
-	);
+          ),
+        ],
+      ),
+    );
   }
 }

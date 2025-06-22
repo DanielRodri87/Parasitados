@@ -15,33 +15,33 @@ class QuestionScreen extends StatefulWidget {
   final String? player2Photo;
   final String currentPlayer;
 
-	const QuestionScreen({
-			super.key, 
-			required this.animal,
-			required this.onAnswer,
-			required this.player1Name,
-			required this.player2Name,
-			required this.player1Photo,
-			required this.player2Photo,
-			required this.currentPlayer,
-	});
+  const QuestionScreen({
+    super.key,
+    required this.animal,
+    required this.onAnswer,
+    required this.player1Name,
+    required this.player2Name,
+    required this.player1Photo,
+    required this.player2Photo,
+    required this.currentPlayer,
+  });
 
   @override
   State<QuestionScreen> createState() => _QuestionScreenState();
 }
 
-class _QuestionScreenState extends State<QuestionScreen> 
+class _QuestionScreenState extends State<QuestionScreen>
     with TickerProviderStateMixin {
   Question? currentQuestion;
   bool isLoading = true;
   bool? isAnswerCorrect;
   int? selectedAnswer;
-  
+
   late AnimationController _pulseController;
   late AnimationController _scaleController;
   late Animation<double> _pulseAnimation;
   late Animation<double> _scaleAnimation;
-  
+
   final Map<String, String> animalNames = {
     'barata': 'ECTOPARASITAS',
     'minhoca': 'HELMINTOS',
@@ -60,27 +60,19 @@ class _QuestionScreenState extends State<QuestionScreen>
       duration: const Duration(seconds: 2),
       vsync: this,
     )..repeat(reverse: true);
-    
+
     _scaleController = AnimationController(
       duration: const Duration(milliseconds: 150),
       vsync: this,
     );
 
-    _pulseAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.1,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
 
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.95,
-    ).animate(CurvedAnimation(
-      parent: _scaleController,
-      curve: Curves.easeInOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -90,25 +82,26 @@ class _QuestionScreenState extends State<QuestionScreen>
     super.dispose();
   }
 
-  void _loadRandomQuestion()  {
+  void _loadRandomQuestion() {
     // Carrega todas as questões do JSON
-    final questions = Provider.of<QuestionsSyncProvider>(context,listen: false).questions;
+    final questions =
+        Provider.of<QuestionsSyncProvider>(context, listen: false).questions;
 
     final questoesList = questions.questoesTopico(animalNames[widget.animal]!);
     if (questoesList.isNotEmpty) {
-      	final random = Random();
-		final q = questoesList[random.nextInt(questoesList.length)];
+      final random = Random();
+      final q = questoesList[random.nextInt(questoesList.length)];
 
-		setState(() {
-			currentQuestion = q;
-			isLoading = false;
-		});
+      setState(() {
+        currentQuestion = q;
+        isLoading = false;
+      });
     }
   }
 
   void _handleAnswer(int answer) async {
     _scaleController.forward().then((_) => _scaleController.reverse());
-    
+
     setState(() {
       selectedAnswer = answer;
       isAnswerCorrect = answer == currentQuestion!.respostaCorreta;
@@ -116,111 +109,120 @@ class _QuestionScreenState extends State<QuestionScreen>
 
     // Mostra dialog de feedback e retorna resultado
     bool shouldProceed = await _showFeedbackDialog();
-    
+
     // Só procede se o dialog não foi descartado
     if (shouldProceed) {
-		widget.onAnswer(isAnswerCorrect!);
-		if (mounted) {
-			Navigator.pop(context);
-		}
-	}
+      widget.onAnswer(isAnswerCorrect!);
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    }
   }
 
   Future<bool> _showFeedbackDialog() async {
     return await showDialog<bool>(
-		context: context,
-		barrierDismissible: false, // Previne fechar ao clicar fora
-		builder: (BuildContext context) {
-			return PopScope( // Previne o botão de voltar
-				canPop: false,
-				child: ScaleTransition(
-					scale: _scaleAnimation,
-					child: AlertDialog(
-					backgroundColor: Colors.transparent,
-					elevation: 0,
-					// Remove the default close button by not setting actions
-					content: Container(
-						padding: const EdgeInsets.all(24),
-						decoration: BoxDecoration(
-						gradient: LinearGradient(
-							colors: isAnswerCorrect!
-							? [Colors.green.shade300, Colors.green.shade500]
-							: [Colors.red.shade300, Colors.red.shade500],
-							begin: Alignment.topLeft,
-							end: Alignment.bottomRight,
-						),
-						borderRadius: BorderRadius.circular(20),
-						boxShadow: [
-							BoxShadow(
-							color: Colors.black.withAlpha((0.2 * 255).toInt()),
-							blurRadius: 20,
-							offset: const Offset(0, 10),
-							),
-						],
-						),
-						child: Column(
-						mainAxisSize: MainAxisSize.min,
-						children: [
-							Icon(
-							isAnswerCorrect! ? Icons.check_circle : Icons.cancel,
-							size: 80,
-							color: Colors.white,
-							),
-							const SizedBox(height: 16),
-							Text(
-							isAnswerCorrect! ? 'Parabéns!' : 'Ops!',
-							style: const TextStyle(
-							fontSize: 28,
-							fontWeight: FontWeight.bold,
-							color: Colors.white,
-							),
-							),
-							const SizedBox(height: 8),
-							Text(
-							isAnswerCorrect! 
-							? 'Resposta correta! 🎉'
-							: 'Resposta incorreta! 😢',
-							style: const TextStyle(
-							fontSize: 18,
-							color: Colors.white,
-							),
-							textAlign: TextAlign.center,
-							),
-							const SizedBox(height: 24),
-							ElevatedButton(
-								onPressed: () => Navigator.of(context).pop(true),
-								style: ElevatedButton.styleFrom(
-									backgroundColor: Colors.white,
-									foregroundColor: isAnswerCorrect! ? Colors.green : Colors.red,
-									padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-									shape: RoundedRectangleBorder(
-										borderRadius: BorderRadius.circular(25),
-									),
-								),
-								child: const Text(
-									'Continuar',
-									style: TextStyle(
-										fontSize: 16,
-										fontWeight: FontWeight.bold,
-									),
-								),
-							),
-						],
-						),
-					),
-					),
-				),
-			);
-		},
-		) ?? false;
-	}
+          context: context,
+          barrierDismissible: false, // Previne fechar ao clicar fora
+          builder: (BuildContext context) {
+            return PopScope(
+              // Previne o botão de voltar
+              canPop: false,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: AlertDialog(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  // Remove the default close button by not setting actions
+                  content: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors:
+                            isAnswerCorrect!
+                                ? [Colors.green.shade300, Colors.green.shade500]
+                                : [Colors.red.shade300, Colors.red.shade500],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha((0.2 * 255).toInt()),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isAnswerCorrect! ? Icons.check_circle : Icons.cancel,
+                          size: 80,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          isAnswerCorrect! ? 'Parabéns!' : 'Ops!',
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          isAnswerCorrect!
+                              ? 'Resposta correta! 🎉'
+                              : 'Resposta incorreta! 😢',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor:
+                                isAnswerCorrect! ? Colors.green : Colors.red,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                          ),
+                          child: const Text(
+                            'Continuar',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ) ??
+        false;
+  }
 
   Widget _buildCurrentPlayerHeader() {
     // Identifica qual jogador está jogando
     final isPlayer1 = widget.currentPlayer == widget.player1Name;
-    final currentPlayerName = isPlayer1 ? widget.player1Name : widget.player2Name;
-    final currentPlayerPhoto = isPlayer1 ? widget.player1Photo : widget.player2Photo;
-    
+    final currentPlayerName =
+        isPlayer1 ? widget.player1Name : widget.player2Name;
+    final currentPlayerPhoto =
+        isPlayer1 ? widget.player1Photo : widget.player2Photo;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(12),
@@ -246,9 +248,11 @@ class _QuestionScreenState extends State<QuestionScreen>
             backgroundColor: Colors.white,
             child: CircleAvatar(
               radius: 22,
-              backgroundImage: (currentPlayerPhoto != null && currentPlayerPhoto.isNotEmpty)
-                  ? FileImage(File(currentPlayerPhoto))
-                  : const AssetImage('assets/images/gatopreto.png') as ImageProvider,
+              backgroundImage:
+                  (currentPlayerPhoto != null && currentPlayerPhoto.isNotEmpty)
+                      ? FileImage(File(currentPlayerPhoto))
+                      : const AssetImage('assets/images/gatopreto.png')
+                          as ImageProvider,
             ),
           ),
           const SizedBox(width: 12),
@@ -364,13 +368,17 @@ class _QuestionScreenState extends State<QuestionScreen>
         boxShadow: [
           // Sombra superior mais clara
           BoxShadow(
-            color: Colors.black.withAlpha((0.03 * 255).toInt()), // Reduzido de 0.05
+            color: Colors.black.withAlpha(
+              (0.03 * 255).toInt(),
+            ), // Reduzido de 0.05
             offset: const Offset(0, -2),
             blurRadius: 8,
           ),
           // Sombra inferior mais suave
           BoxShadow(
-            color: Colors.black.withAlpha((0.08 * 255).toInt()), // Reduzido de 0.2
+            color: Colors.black.withAlpha(
+              (0.08 * 255).toInt(),
+            ), // Reduzido de 0.2
             offset: const Offset(0, 4),
             blurRadius: 15, // Aumentado para suavizar
           ),
@@ -422,7 +430,7 @@ class _QuestionScreenState extends State<QuestionScreen>
     final isSelected = selectedAnswer == answerIndex;
     final isCorrect = answerIndex == currentQuestion!.respostaCorreta;
     final showResult = selectedAnswer != null;
-    
+
     Color backgroundColor = Colors.white;
     Color borderColor = const Color(0xFF69D1E9).withAlpha((0.3 * 255).toInt());
     Color textColor = Colors.black87;
@@ -446,20 +454,21 @@ class _QuestionScreenState extends State<QuestionScreen>
       child: Material(
         borderRadius: BorderRadius.circular(15),
         elevation: isSelected ? 8 : 2,
-        shadowColor: isSelected ? letterColor.withAlpha((0.3 * 255).toInt()) : Colors.black.withAlpha((0.1 * 255).toInt()),
+        shadowColor:
+            isSelected
+                ? letterColor.withAlpha((0.3 * 255).toInt())
+                : Colors.black.withAlpha((0.1 * 255).toInt()),
         child: InkWell(
           borderRadius: BorderRadius.circular(15),
-          onTap: selectedAnswer == null ? () => _handleAnswer(answerIndex) : null,
+          onTap:
+              selectedAnswer == null ? () => _handleAnswer(answerIndex) : null,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: backgroundColor,
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(
-                color: borderColor,
-                width: isSelected ? 2 : 1,
-              ),
+              border: Border.all(color: borderColor, width: isSelected ? 2 : 1),
             ),
             child: Row(
               children: [
@@ -502,17 +511,9 @@ class _QuestionScreenState extends State<QuestionScreen>
                   ),
                 ),
                 if (showResult && isCorrect)
-                  const Icon(
-                    Icons.check_circle,
-                    color: Colors.green,
-                    size: 24,
-                  ),
+                  const Icon(Icons.check_circle, color: Colors.green, size: 24),
                 if (showResult && isSelected && !isCorrect)
-                  const Icon(
-                    Icons.cancel,
-                    color: Colors.red,
-                    size: 24,
-                  ),
+                  const Icon(Icons.cancel, color: Colors.red, size: 24),
               ],
             ),
           ),
@@ -529,10 +530,7 @@ class _QuestionScreenState extends State<QuestionScreen>
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                Color(0xFFF8FDFF),
-                Color(0xFFF0F9FF),
-              ],
+              colors: [Color(0xFFF8FDFF), Color(0xFFF0F9FF)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -553,52 +551,60 @@ class _QuestionScreenState extends State<QuestionScreen>
                     textAlign: TextAlign.center,
                   ),
                 ),
-                
+
                 // Header do jogador atual
                 _buildCurrentPlayerHeader(),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Seção do animal
                 _buildAnimalSection(),
-                
-                const SizedBox(height: 20),
-                
-                // Conteúdo principal em um layout flexível
-                if (!isLoading) Expanded(
-                  child: Column(
-                    children: [
-                      _buildQuestionCard(),
-                      const SizedBox(height: 8), // Reduzido de 20 para 8
-                      // Área de respostas com scroll
-                      Expanded(
-                        flex: 4, // Aumentado de 3 para 4 para dar mais espaço às alternativas
-                        child: ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: currentQuestion!.opcoes.length,
-                          itemBuilder: (context, index) {
-                            final op = currentQuestion!.opcoes[index];
-                            
-							String texto;
-                            String letra;
 
-							letra = Question.parseRespostaString(index);
-							texto = op;
-                            return _buildAnswerOption(texto, index + 1, letra);
-                          },
+                const SizedBox(height: 20),
+
+                // Conteúdo principal em um layout flexível
+                if (!isLoading)
+                  Expanded(
+                    child: Column(
+                      children: [
+                        _buildQuestionCard(),
+                        const SizedBox(height: 8), // Reduzido de 20 para 8
+                        // Área de respostas com scroll
+                        Expanded(
+                          flex:
+                              4, // Aumentado de 3 para 4 para dar mais espaço às alternativas
+                          child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: currentQuestion!.opcoes.length,
+                            itemBuilder: (context, index) {
+                              final op = currentQuestion!.opcoes[index];
+
+                              String texto;
+                              String letra;
+
+                              letra = Question.parseRespostaString(index);
+                              texto = op;
+                              return _buildAnswerOption(
+                                texto,
+                                index + 1,
+                                letra,
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8), // Reduzido de 16 para 8
-                    ],
+                        const SizedBox(height: 8), // Reduzido de 16 para 8
+                      ],
+                    ),
                   ),
-                ),
-                
+
                 // Loading indicator
                 if (isLoading)
                   const Expanded(
                     child: Center(
                       child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF69D1E9)),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Color(0xFF69D1E9),
+                        ),
                       ),
                     ),
                   ),

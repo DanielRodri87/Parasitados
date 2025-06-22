@@ -7,8 +7,6 @@ class LoadingGameUmJogador extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LoadingGamePage(
-		tipoModeGame: TypeModeGame.umJogador,
-	);
+    return LoadingGamePage(tipoModeGame: TypeModeGame.umJogador);
   }
 }
