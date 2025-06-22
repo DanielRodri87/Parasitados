@@ -359,10 +359,10 @@ class RoletaScreenState extends State<RoletaScreen> with TickerProviderStateMixi
 										player2Animals.add(selectedAnimal!);
 									}
 								}
+								_checkForWinner();
 							} else {
 								qtdCorreta++;
 							}
-							_checkForWinner();
 						} else {
 							if (widget.modeGame == TypeModeGame.umJogador) {
 								isNotCorrect = true;
@@ -466,27 +466,25 @@ class RoletaScreenState extends State<RoletaScreen> with TickerProviderStateMixi
 				maxLines: 1,
 			),
 			const SizedBox(height: 8),
-			Row(
-				mainAxisAlignment: MainAxisAlignment.center,
+			Wrap(
+				alignment: WrapAlignment.center,
+				spacing: 4,
 				children: animals.map((animal) {
-				final bool isAchieved = achievedAnimals.contains(animal);
-				return Padding(
-					padding: const EdgeInsets.only(right: 4),
-					child: Container(
-					padding: const EdgeInsets.all(2),
-					decoration: BoxDecoration(
-						shape: BoxShape.circle,
-						color: isAchieved 
-						? const Color(0xFF81DC6E).withAlpha((0.2 * 255).toInt())
-						: Colors.grey.withAlpha((0.1 * 255).toInt()),
-					),
-					child: Image.asset(
+					final bool isAchieved = achievedAnimals.contains(animal);
+					return Container(
+						padding: const EdgeInsets.all(2),
+						decoration: BoxDecoration(
+							shape: BoxShape.circle,
+							color: isAchieved 
+								? const Color(0xFF81DC6E).withAlpha((0.2 * 255).toInt())
+								: Colors.grey.withAlpha((0.1 * 255).toInt()),
+						),
+						child: Image.asset(
 							isAchieved ? coloredAnimalImages[animal]! : grayAnimalImages[animal]!,
-						width: 20,
-						height: 20,
-					),
-					),
-				);
+							width: 20,
+							height: 20,
+						),
+					);
 				}).toList(),
 			),
 			],
@@ -689,77 +687,81 @@ class RoletaScreenState extends State<RoletaScreen> with TickerProviderStateMixi
 		];
 		
 		return Container(
-			color: Colors.black.withAlpha((0.8 * 255).toInt()),
-			child: Stack(
-				children: [
-					Center(
-						child: Container(
-							margin: const EdgeInsets.all(32),
-							padding: const EdgeInsets.only(
-								left: 32,
-								right: 32,
-								top: 70,
-								bottom: 70
-							),
-							decoration: BoxDecoration(
-								gradient: LinearGradient(
-									colors: [
-										Color(0xffCD1A1A),
-										Color(0xff670D0D),
-									],
-									begin: Alignment.topLeft,
-									end: Alignment.bottomRight,
-								),
-								borderRadius: BorderRadius.circular(20),
-								boxShadow: [
-									BoxShadow(
-										color: Colors.black.withAlpha((0.3 * 255).toInt()),
-										blurRadius: 20,
-										offset: const Offset(0, 10),
-									),
-								],
-							),
-							child: Column(
-								mainAxisSize: MainAxisSize.min,
-								children: [
-									IconButton(
-										onPressed: (){
-											if(mounted) Navigator.of(context).pop();
-										}, 
-										icon: Icon(
-											Icons.close
-										)
-									),
-									widgetText[qtdIncorreta - 1],
-									const SizedBox(height: 30),
-									if(qtdIncorreta == 3)
-										ElevatedButton(
-											onPressed: () {
-												Navigator.restorablePopAndPushNamed(context, Routes.rankingScreen);
-											},
-											style: ElevatedButton.styleFrom(
-												backgroundColor: Colors.white,
-												foregroundColor: Colors.orange.shade400,
-												padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-												shape: RoundedRectangleBorder(
-													borderRadius: BorderRadius.circular(25),
-												),
-												elevation: 5,
-											),
-											child: const Text(
-												'Ranking',
-											 style: TextStyle(
-													fontSize: 18,
-													fontWeight: FontWeight.bold,
-												),
-											),
-										)
-								],
-							),
-						),
+			decoration: BoxDecoration(
+				gradient: LinearGradient(
+					colors: [
+						Color(0xffCD1A1A),
+						Color(0xff670D0D),
+					],
+					begin: Alignment.topLeft,
+					end: Alignment.bottomRight,
+				),
+				borderRadius: BorderRadius.circular(20),
+				boxShadow: [
+					BoxShadow(
+						color: Colors.black.withAlpha((0.3 * 255).toInt()),
+						blurRadius: 20,
+						offset: const Offset(0, 10),
 					),
 				],
 			),
+			child: Column(
+				mainAxisSize: MainAxisSize.min,
+				  children: [
+					Row(
+						mainAxisAlignment: MainAxisAlignment.end,
+					  children: [
+					    IconButton(
+					    	onPressed: (){
+					    		if(mounted) Navigator.of(context).pop();
+					    	}, 
+					    	icon: Icon(
+					    		Icons.close,
+								color: Colors.white,
+					    	)
+					    ),
+					  ],
+					),
+				    Container(
+				    	padding: const EdgeInsets.only(
+				    		left: 32,
+				    		right: 32,
+				    		top: 70,
+				    		bottom: 70
+				    	),
+				    	
+				    	child: Column(
+				    		mainAxisSize: MainAxisSize.min,
+				    		children: [
+				    			widgetText[qtdIncorreta - 1],
+				    			const SizedBox(height: 30),
+				    			if(qtdIncorreta == 3)
+				    				ElevatedButton(
+				    					onPressed: () {
+				    						Navigator.restorablePopAndPushNamed(context, Routes.rankingScreen);
+				    					},
+				    					style: ElevatedButton.styleFrom(
+				    						backgroundColor: Colors.white,
+				    						foregroundColor: Colors.orange.shade400,
+				    						padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+				    						shape: RoundedRectangleBorder(
+				    							borderRadius: BorderRadius.circular(25),
+				    						),
+				    						elevation: 5,
+				    					),
+				    					child: const Text(
+				    						'Ranking',
+				    					 style: TextStyle(
+				    							fontSize: 18,
+				    							fontWeight: FontWeight.bold,
+				    						),
+				    					),
+				    				)
+				    		],
+				    	),
+				    ),
+				  ],
+				),
 		);
 	}
 

@@ -10,3 +10,6 @@ setup:
 run:
 	@set -a; source .env; set +a; docker compose up -d
 	@flutter run -d linux
+
+release:
+	flutter build apk --release

@@ -233,7 +233,7 @@ class _LoginFormContainerState extends State<LoginFormContainer> {
 							try {
 								await salvarNoBanco();
 								if (!context.mounted) return;
-								Navigator.pushNamed(context, Routes.loadingScreenUmJogador);
+								Navigator.pushReplacementNamed(context, Routes.loadingScreenUmJogador);
 							} catch (e) {
 								if (!context.mounted) return;
 								ScaffoldMessenger.of(context).showSnackBar(
